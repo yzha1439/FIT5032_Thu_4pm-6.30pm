@@ -1,0 +1,26 @@
+/* Tag selector */
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Class selector */
+.form {
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* ID selectors and focus pseudo-class */
+#username:focus,
+#password:focus,
+#isAustralian:focus,
+#reason:focus {
+  border-color: #ff6347;
+  background-color: #ffebe8;
+}
+
+/* Attribute selector */
+select[id="gender"] {
+  background-color: #d3d3d3;
+}
