@@ -7,7 +7,17 @@ import { activities } from './data/activities.js'
 
 const selectedActivityId = ref('')
 
-const featuredActivities = computed(() => activities.filter((activity) => activity.featured))
+const featuredActivities = computed(() =>
+  activities.filter((activity) => activity.featured),
+)
+
+const suburbCount = computed(
+  () => new Set(activities.map((activity) => activity.suburb)).size,
+)
+
+const freeActivityCount = computed(
+  () => activities.filter((activity) => activity.cost === 0).length,
+)
 
 function chooseActivity(activity) {
   selectedActivityId.value = String(activity.id)
@@ -22,154 +32,291 @@ function chooseActivity(activity) {
   <AppHeader />
 
   <main id="main-content">
-    <section id="home" class="hero" aria-labelledby="hero-title">
+    <section
+      id="home"
+      class="hero"
+      aria-labelledby="hero-title"
+    >
+      <div class="hero__shape hero__shape--one"></div>
+      <div class="hero__shape hero__shape--two"></div>
+
       <div class="site-container hero__layout">
         <div class="hero__content">
-          <p class="eyebrow">Move locally. Act on climate.</p>
+          <p class="eyebrow eyebrow--light">
+            Melbourne moves differently
+          </p>
 
-          <h1 id="hero-title">Healthier journeys for people and the planet</h1>
+          <h1 id="hero-title">
+            Move through the city.
+            <span>Change how it moves.</span>
+          </h1>
 
           <p class="hero__lead">
-            PlayPath Melbourne connects residents with affordable community sport, walking groups
-            and social rides while supporting safer, lower-emission travel.
+            Discover affordable community sport, walking groups and
+            social rides while supporting healthier, lower-emission
+            journeys across Melbourne.
           </p>
 
           <div class="hero__actions">
-            <a class="button button--primary" href="#activities"> Explore activities </a>
+            <a
+              class="button button--primary"
+              href="#activities"
+            >
+              Explore local activities
+            </a>
 
-            <a class="button button--secondary" href="#get-involved"> Get involved </a>
+            <a
+              class="button button--outline-light"
+              href="#get-involved"
+            >
+              Get involved
+            </a>
           </div>
+
+          <dl class="hero__statistics">
+            <div>
+              <dt>{{ activities.length }}</dt>
+              <dd>local activities</dd>
+            </div>
+
+            <div>
+              <dt>{{ suburbCount }}</dt>
+              <dd>Melbourne suburbs</dd>
+            </div>
+
+            <div>
+              <dt>{{ freeActivityCount }}</dt>
+              <dd>free activities</dd>
+            </div>
+          </dl>
         </div>
 
-        <aside class="impact-card" aria-label="PlayPath community impact">
-          <p class="impact-card__label">Community impact</p>
-
-          <strong> {{ activities.length }} local activities </strong>
-
-          <span> Across walking, cycling, running and community sport </span>
-
-          <div class="impact-card__stats">
-            <div>
-              <strong>10</strong>
-              <span>suburbs</span>
-            </div>
-
-            <div>
-              <strong>9</strong>
-              <span>free events</span>
-            </div>
-
-            <div>
-              <strong>11</strong>
-              <span>beginner options</span>
-            </div>
+        <div
+          class="route-map"
+          aria-label="Stylised active travel route connecting Melbourne suburbs"
+        >
+          <div class="route-map__heading">
+            <span>PlayPath route</span>
+            <strong>Melbourne network</strong>
           </div>
-        </aside>
+
+          <div class="route-line route-line--purple"></div>
+          <div class="route-line route-line--coral"></div>
+          <div class="route-line route-line--lime"></div>
+
+          <div class="route-stop route-stop--footscray">
+            <span></span>
+            Footscray
+          </div>
+
+          <div class="route-stop route-stop--parkville">
+            <span></span>
+            Parkville
+          </div>
+
+          <div class="route-stop route-stop--carlton">
+            <span></span>
+            Carlton
+          </div>
+
+          <div class="route-stop route-stop--richmond">
+            <span></span>
+            Richmond
+          </div>
+
+          <div class="route-stop route-stop--stkilda">
+            <span></span>
+            St Kilda
+          </div>
+
+          <p class="route-map__note">
+            Community sport · Walking · Cycling
+          </p>
+        </div>
       </div>
     </section>
 
-    <section class="site-container section" aria-labelledby="featured-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Featured this month</p>
-
-          <h2 id="featured-title">Start with a local activity</h2>
-        </div>
-
-        <a class="text-link" href="#activities">
-          See the full directory
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
-
-      <div class="featured-grid">
-        <article v-for="activity in featuredActivities" :key="activity.id" class="featured-card">
-          <span class="pill">
-            {{ activity.type }}
-          </span>
-
-          <h3>{{ activity.name }}</h3>
-
-          <p>{{ activity.description }}</p>
-
-          <ul class="meta-list" aria-label="Activity information">
-            <li>{{ activity.dateLabel }}</li>
-            <li>{{ activity.suburb }}</li>
-
-            <li>
-              {{ activity.cost === 0 ? 'Free' : `$${activity.cost}` }}
-            </li>
-          </ul>
-
-          <button class="text-button" type="button" @click="chooseActivity(activity)">
-            Register interest
-            <span aria-hidden="true">→</span>
-          </button>
-        </article>
-      </div>
-    </section>
-
-    <ActivityDirectory :activities="activities" @select="chooseActivity" />
-
-    <section class="why-section" aria-labelledby="why-title">
+    <section
+      class="featured-section"
+      aria-labelledby="featured-title"
+    >
       <div class="site-container section">
-        <div class="section-heading section-heading--light">
+        <div class="section-heading">
           <div>
-            <p class="eyebrow eyebrow--light">Why active travel?</p>
+            <p class="eyebrow">Featured this month</p>
 
-            <h2 id="why-title">Small journeys create meaningful change</h2>
+            <h2 id="featured-title">
+              Three ways to start moving
+            </h2>
+
+            <p>
+              Beginner-friendly activities selected from the
+              PlayPath Melbourne community directory.
+            </p>
           </div>
+
+          <a
+            class="section-link"
+            href="#activities"
+          >
+            View full directory
+            <span aria-hidden="true">↘</span>
+          </a>
         </div>
 
-        <div class="benefit-grid">
-          <article>
-            <span class="benefit-number">01</span>
+        <div class="featured-grid">
+          <article
+            v-for="(activity, index) in featuredActivities"
+            :key="activity.id"
+            class="featured-card"
+          >
+            <div class="featured-card__number">
+              0{{ index + 1 }}
+            </div>
 
-            <h3>Lower emissions</h3>
+            <div class="featured-card__header">
+              <span class="activity-type">
+                {{ activity.type }}
+              </span>
 
-            <p>Replace short car trips with walking, cycling and shared community journeys.</p>
-          </article>
+              <span
+                class="activity-status"
+                :class="{
+                  'activity-status--limited':
+                    activity.status === 'Limited',
+                }"
+              >
+                {{ activity.status }}
+              </span>
+            </div>
 
-          <article>
-            <span class="benefit-number">02</span>
+            <h3>{{ activity.name }}</h3>
 
-            <h3>Stronger communities</h3>
+            <p>{{ activity.description }}</p>
 
-            <p>Meet neighbours and local clubs through welcoming, low-cost activities.</p>
-          </article>
+            <dl class="featured-card__details">
+              <div>
+                <dt>Date</dt>
+                <dd>{{ activity.dateLabel }}</dd>
+              </div>
 
-          <article>
-            <span class="benefit-number">03</span>
+              <div>
+                <dt>Suburb</dt>
+                <dd>{{ activity.suburb }}</dd>
+              </div>
 
-            <h3>Healthier routines</h3>
+              <div>
+                <dt>Cost</dt>
+                <dd>
+                  {{
+                    activity.cost === 0
+                      ? 'Free'
+                      : `$${activity.cost}`
+                  }}
+                </dd>
+              </div>
+            </dl>
 
-            <p>Build accessible movement into everyday life at a comfortable pace.</p>
+            <button
+              class="arrow-button"
+              type="button"
+              @click="chooseActivity(activity)"
+            >
+              Register interest
+              <span aria-hidden="true">→</span>
+            </button>
           </article>
         </div>
       </div>
     </section>
 
-    <GetInvolvedForm :activities="activities" :selected-activity-id="selectedActivityId" />
+    <ActivityDirectory
+      :activities="activities"
+      @select="chooseActivity"
+    />
+
+    <section
+      class="impact-section"
+      aria-labelledby="impact-title"
+    >
+      <div class="site-container section">
+        <div class="impact-section__heading">
+          <p class="eyebrow eyebrow--light">
+            Why active travel?
+          </p>
+
+          <h2 id="impact-title">
+            One local journey can create three kinds of change.
+          </h2>
+        </div>
+
+        <div class="impact-grid">
+          <article>
+            <span class="impact-grid__number">01</span>
+
+            <h3>Climate</h3>
+
+            <p>
+              Replace short private-car trips with walking, cycling
+              and shared community journeys.
+            </p>
+          </article>
+
+          <article>
+            <span class="impact-grid__number">02</span>
+
+            <h3>Community</h3>
+
+            <p>
+              Meet neighbours, volunteers and local clubs through
+              welcoming activities.
+            </p>
+          </article>
+
+          <article>
+            <span class="impact-grid__number">03</span>
+
+            <h3>Wellbeing</h3>
+
+            <p>
+              Make regular movement more accessible, social and
+              enjoyable.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <GetInvolvedForm
+      :activities="activities"
+      :selected-activity-id="selectedActivityId"
+    />
   </main>
 
   <footer class="site-footer">
     <div class="site-container site-footer__layout">
       <div>
-        <strong>PlayPath Melbourne</strong>
+        <a
+          class="footer-brand"
+          href="#home"
+        >
+          PlayPath Melbourne
+        </a>
 
         <p>
-          A fictional not-for-profit supporting climate action through community sport and active
-          travel.
+          Climate action through community sport and active travel.
         </p>
       </div>
 
       <nav aria-label="Footer navigation">
         <a href="#home">Home</a>
-        <a href="#activities">Activities</a>
+        <a href="#activities">Explore</a>
         <a href="#get-involved">Get involved</a>
       </nav>
 
-      <p>© 2026 PlayPath Melbourne</p>
+      <p class="site-footer__copyright">
+        © 2026 PlayPath Melbourne
+      </p>
     </div>
   </footer>
 </template>
