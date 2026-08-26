@@ -1,4 +1,4 @@
-@import "./base.css";
+@import './base.css';
 
 #app {
   min-height: 100vh;
@@ -732,9 +732,9 @@ textarea {
   resize: vertical;
 }
 
-input[aria-invalid="true"],
-select[aria-invalid="true"],
-textarea[aria-invalid="true"] {
+input[aria-invalid='true'],
+select[aria-invalid='true'],
+textarea[aria-invalid='true'] {
   border-color: var(--error);
   box-shadow: 3px 3px 0 var(--error);
 }
@@ -868,13 +868,8 @@ textarea[aria-invalid="true"] {
   background: var(--primary);
 }
 
-.activity-card--community-sport
-  .activity-card__route {
-  background: linear-gradient(
-    90deg,
-    var(--primary) 0 50%,
-    var(--coral) 50% 100%
-  );
+.activity-card--community-sport .activity-card__route {
+  background: linear-gradient(90deg, var(--primary) 0 50%, var(--coral) 50% 100%);
 }
 
 .activity-card > p {
@@ -1016,7 +1011,7 @@ textarea[aria-invalid="true"] {
 
   height: 4px;
 
-  content: "";
+  content: '';
   background: var(--lime);
 }
 
@@ -1282,9 +1277,7 @@ textarea[aria-invalid="true"] {
 
     width: max-content;
 
-    transform:
-      translateX(-50%)
-      rotate(90deg);
+    transform: translateX(-50%) rotate(90deg);
     transform-origin: center;
   }
 

@@ -20,11 +20,9 @@
   --error: #bd2c3f;
   --success: #16734a;
 
-  --shadow-small:
-    4px 4px 0 var(--ink);
+  --shadow-small: 4px 4px 0 var(--ink);
 
-  --shadow-large:
-    12px 12px 0 var(--ink);
+  --shadow-large: 12px 12px 0 var(--ink);
 }
 
 *,
@@ -46,13 +44,7 @@ body {
   color: var(--ink);
   background: var(--paper);
 
-  font-family:
-    "Avenir Next",
-    Avenir,
-    "Segoe UI",
-    Helvetica,
-    Arial,
-    sans-serif;
+  font-family: 'Avenir Next', Avenir, 'Segoe UI', Helvetica, Arial, sans-serif;
 
   line-height: 1.6;
   text-rendering: optimizeLegibility;
@@ -85,11 +77,7 @@ p {
 h1,
 h2,
 h3 {
-  font-family:
-    "Arial Rounded MT Bold",
-    "Avenir Next",
-    Arial,
-    sans-serif;
+  font-family: 'Arial Rounded MT Bold', 'Avenir Next', Arial, sans-serif;
 
   line-height: 1.08;
   letter-spacing: -0.035em;

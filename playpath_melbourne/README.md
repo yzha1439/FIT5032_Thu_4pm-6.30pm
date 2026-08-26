@@ -1,38 +1,124 @@
-# playpath_melbourne
+# PlayPath Melbourne
 
-This template should help get you started developing with Vue 3 in Vite.
+PlayPath Melbourne is a Vue 3 web application developed for a
+fictional Melbourne-based not-for-profit organisation.
 
-## Recommended IDE Setup
+The organisation promotes climate action through community sport
+and active travel. The application helps residents find and compare
+local walking, cycling, training and community sport activities.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## A1.2 Business Requirements
 
-## Recommended Browser Setup
+### BR A.1: Development Stack
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+The application is developed using Vue 3 with the Composition API.
 
-## Customize configuration
+The interface is divided into reusable Vue components, including:
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- AppHeader
+- ActivityDirectory
+- ActivityFilters
+- ActivityCard
+- GetInvolvedForm
+
+### BR A.2: Responsiveness
+
+The application provides responsive layouts for mobile, tablet,
+desktop and large desktop screens.
+
+The activity directory displays cards on smaller devices and changes
+to a comparison table on desktop screens.
+
+Responsive breakpoints include:
+
+- Less than 576px
+- 576px and above
+- 768px and above
+- 992px and above
+- 1200px and above
+- 1400px and above
+
+### BR B.1: Validations
+
+The Get Involved form implements several types of validation:
+
+- Required-field validation
+- Minimum name-length validation
+- Email-format validation
+- Four-digit postcode validation
+- Maximum message-length validation
+- Consent validation
+
+Validation messages are displayed beside the relevant fields.
+
+### BR B.2: Dynamic Data
+
+Activity information is stored in a JavaScript data structure and
+dynamically displayed using Vue data binding.
+
+Users can:
+
+- Search by activity, club or suburb
+- Filter by suburb
+- Filter by activity type
+- Filter by accessibility
+- Filter by cost
+- Clear all filters
+- View the number of matching activities
+
+Successful expressions of interest are saved in Local Storage under:
+
+`playpathExpressionsOfInterest`
+
+## Visual Design
+
+The application uses an original Melbourne urban-route visual
+identity.
+
+The design includes:
+
+- A purple, coral and lime colour palette
+- Route lines and suburb stop markers
+- Asymmetrical card and button shapes
+- Responsive activity cards
+- A Community Pass-inspired form
+- Persistent form labels and visible keyboard focus states
 
 ## Project Setup
 
-```sh
+Install dependencies:
+
+```
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Start the development server:
 
-```sh
+```
 npm run dev
 ```
 
-### Compile and Minify for Production
+Create a production build:
 
-```sh
+```
 npm run build
 ```
+
+Format the source code:
+
+```
+npm run format
+```
+
+## Testing
+
+The application should be tested at the following screen widths:
+
+375px
+576px
+768px
+992px
+1200px
+1440px
+
+The browser console should contain no errors or warnings.
