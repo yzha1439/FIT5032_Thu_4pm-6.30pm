@@ -1,10 +1,28 @@
 <script setup>
 import { ref } from 'vue'
+import { useAuth } from '../services/auth.js'
+
+defineProps({
+  currentPage: {
+    type: String,
+    required: true,
+  },
+})
+
+const emit = defineEmits([
+  'navigate',
+])
 
 const menuOpen = ref(false)
 
-function closeMenu() {
+const {
+  currentUser,
+  isAdmin,
+} = useAuth()
+
+function navigate(page) {
   menuOpen.value = false
+  emit('navigate', page)
 }
 </script>
 
@@ -22,15 +40,21 @@ function closeMenu() {
         class="brand"
         href="#home"
         aria-label="PlayPath Melbourne home"
-        @click="closeMenu"
+        @click.prevent="navigate('home')"
       >
         <span
           class="brand__symbol"
           aria-hidden="true"
         >
           <span class="brand__route"></span>
-          <span class="brand__stop brand__stop--one"></span>
-          <span class="brand__stop brand__stop--two"></span>
+
+          <span
+            class="brand__stop brand__stop--one"
+          ></span>
+
+          <span
+            class="brand__stop brand__stop--two"
+          ></span>
         </span>
 
         <span class="brand__text">
@@ -58,31 +82,107 @@ function closeMenu() {
       <nav
         id="primary-navigation"
         class="primary-nav"
-        :class="{ 'primary-nav--open': menuOpen }"
+        :class="{
+          'primary-nav--open': menuOpen,
+        }"
         aria-label="Main navigation"
       >
         <a
           href="#home"
-          @click="closeMenu"
+          :aria-current="
+            currentPage === 'home'
+              ? 'page'
+              : undefined
+          "
+          @click.prevent="navigate('home')"
         >
           Home
         </a>
 
         <a
           href="#activities"
-          @click="closeMenu"
+          :aria-current="
+            currentPage === 'activities'
+              ? 'page'
+              : undefined
+          "
+          @click.prevent="
+            navigate('activities')
+          "
         >
           Explore
         </a>
 
         <a
-          class="primary-nav__action"
+          href="#ratings"
+          :aria-current="
+            currentPage === 'ratings'
+              ? 'page'
+              : undefined
+          "
+          @click.prevent="navigate('ratings')"
+        >
+          Ratings
+        </a>
+
+        <a
           href="#get-involved"
-          @click="closeMenu"
+          :aria-current="
+            currentPage === 'get-involved'
+              ? 'page'
+              : undefined
+          "
+          @click.prevent="
+            navigate('get-involved')
+          "
         >
           Get involved
+        </a>
+
+        <a
+          v-if="isAdmin"
+          href="#admin"
+          :aria-current="
+            currentPage === 'admin'
+              ? 'page'
+              : undefined
+          "
+          @click.prevent="navigate('admin')"
+        >
+          Admin
+        </a>
+
+        <a
+          class="primary-nav__action"
+          href="#account"
+          :aria-current="
+            currentPage === 'account'
+              ? 'page'
+              : undefined
+          "
+          @click.prevent="
+            navigate('account')
+          "
+        >
+          {{
+            currentUser
+              ? currentUser.name
+              : 'Sign in'
+          }}
         </a>
       </nav>
     </div>
   </header>
 </template>
+
+<style scoped>
+.primary-nav a[aria-current='page'] {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+.primary-nav__action[aria-current='page'] {
+  text-decoration-color: var(--lime);
+}
+</style>
