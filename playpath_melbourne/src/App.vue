@@ -1,20 +1,47 @@
 <script setup>
-import { computed, ref } from 'vue'
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from 'vue'
+
 import AppHeader from './components/AppHeader.vue'
 import ActivityDirectory from './components/ActivityDirectory.vue'
+import AuthPanel from './components/AuthPanel.vue'
+import RatingPanel from './components/RatingPanel.vue'
+import AdminDashboard from './components/AdminDashboard.vue'
 import GetInvolvedForm from './components/GetInvolvedForm.vue'
-import { activities } from './data/activities.js'
 
+import { activities } from './data/activities.js'
+import { useAuth } from './services/auth.js'
+
+const { isAdmin } = useAuth()
+
+const validPages = [
+  'home',
+  'activities',
+  'ratings',
+  'get-involved',
+  'account',
+  'admin',
+]
+
+const currentPage = ref('home')
 const selectedActivityId = ref('')
 
 const featuredActivities = computed(() =>
-  activities.filter((activity) => activity.featured),
+  activities.filter(
+    (activity) => activity.featured,
+  ),
 )
 
 const suburbCount = computed(
   () =>
     new Set(
-      activities.map((activity) => activity.suburb),
+      activities.map(
+        (activity) => activity.suburb,
+      ),
     ).size,
 )
 
@@ -25,29 +52,141 @@ const freeActivityCount = computed(
     ).length,
 )
 
-function chooseActivity(activity) {
-  selectedActivityId.value = String(activity.id)
+function pageFromAddress() {
+  const page =
+    window.location.hash
+      .replace(/^#/, '')
+      .trim() || 'home'
 
-  document
-    .querySelector('#get-involved')
-    ?.scrollIntoView({
-      behavior: 'smooth',
-    })
+  return validPages.includes(page)
+    ? page
+    : 'home'
 }
+
+function allowedPage(page) {
+  /*
+   * Everyone may view Ratings.
+   * RatingPanel prevents guests from submitting.
+   *
+   * Only administrators may view Admin.
+   */
+  if (
+    page === 'admin' &&
+    !isAdmin.value
+  ) {
+    return 'account'
+  }
+
+  return page
+}
+
+function displayPage(
+  requestedPage,
+  addHistory = true,
+) {
+  const safePage = validPages.includes(
+    requestedPage,
+  )
+    ? requestedPage
+    : 'home'
+
+  const nextPage = allowedPage(safePage)
+
+  currentPage.value = nextPage
+
+  const nextAddress = `#${nextPage}`
+
+  if (
+    addHistory &&
+    window.location.hash !== nextAddress
+  ) {
+    window.history.pushState(
+      {
+        page: nextPage,
+      },
+      '',
+      nextAddress,
+    )
+  }
+
+  /*
+   * Immediately return to the top.
+   * There is no smooth vertical movement.
+   */
+  requestAnimationFrame(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    })
+
+    document
+      .querySelector('#main-content')
+      ?.focus({
+        preventScroll: true,
+      })
+  })
+}
+
+function handleHistoryChange() {
+  displayPage(
+    pageFromAddress(),
+    false,
+  )
+}
+
+function chooseActivity(activity) {
+  selectedActivityId.value =
+    String(activity.id)
+
+  displayPage('get-involved')
+}
+
+onMounted(() => {
+  displayPage(
+    pageFromAddress(),
+    false,
+  )
+
+  window.addEventListener(
+    'popstate',
+    handleHistoryChange,
+  )
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener(
+    'popstate',
+    handleHistoryChange,
+  )
+})
 </script>
 
 <template>
-  <AppHeader />
+  <AppHeader
+    :current-page="currentPage"
+    @navigate="displayPage"
+  />
 
-  <main id="main-content">
-    <!-- Hero section -->
+  <!-- Home page -->
+  <main
+    v-if="currentPage === 'home'"
+    id="main-content"
+    tabindex="-1"
+  >
     <section
-      id="home"
       class="hero"
       aria-labelledby="hero-title"
     >
-      <div class="hero__shape hero__shape--one"></div>
-      <div class="hero__shape hero__shape--two"></div>
+      <div
+        class="hero__shape hero__shape--one"
+        aria-hidden="true"
+      ></div>
+
+      <div
+        class="hero__shape hero__shape--two"
+        aria-hidden="true"
+      ></div>
 
       <div class="site-container hero__layout">
         <div class="hero__content">
@@ -57,35 +196,47 @@ function chooseActivity(activity) {
 
           <h1 id="hero-title">
             Move through the city.
-            <span>Change how it moves.</span>
+
+            <span>
+              Change how it moves.
+            </span>
           </h1>
 
           <p class="hero__lead">
-            Discover affordable community sport, walking
-            groups and social rides while supporting
-            healthier, lower-emission journeys across
-            Melbourne.
+            Discover affordable community sport,
+            walking groups and social rides while
+            supporting healthier, lower-emission
+            journeys across Melbourne.
           </p>
 
           <div class="hero__actions">
-            <a
+            <button
               class="button button--primary"
-              href="#activities"
+              type="button"
+              @click="
+                displayPage('activities')
+              "
             >
               Explore local activities
-            </a>
+            </button>
 
-            <a
+            <button
               class="button button--outline-light"
-              href="#get-involved"
+              type="button"
+              @click="
+                displayPage('get-involved')
+              "
             >
               Get involved
-            </a>
+            </button>
           </div>
 
           <dl class="hero__statistics">
             <div>
-              <dt>{{ activities.length }}</dt>
+              <dt>
+                {{ activities.length }}
+              </dt>
+
               <dd>local activities</dd>
             </div>
 
@@ -95,20 +246,24 @@ function chooseActivity(activity) {
             </div>
 
             <div>
-              <dt>{{ freeActivityCount }}</dt>
+              <dt>
+                {{ freeActivityCount }}
+              </dt>
+
               <dd>free activities</dd>
             </div>
           </dl>
         </div>
 
-        <!-- Original Melbourne route illustration -->
         <div
           class="route-map"
           aria-label="Stylised active travel route connecting Melbourne suburbs"
         >
           <div class="route-map__heading">
             <span>PlayPath route</span>
-            <strong>Melbourne network</strong>
+            <strong>
+              Melbourne network
+            </strong>
           </div>
 
           <div
@@ -126,27 +281,37 @@ function chooseActivity(activity) {
             aria-hidden="true"
           ></div>
 
-          <div class="route-stop route-stop--footscray">
+          <div
+            class="route-stop route-stop--footscray"
+          >
             <span aria-hidden="true"></span>
             Footscray
           </div>
 
-          <div class="route-stop route-stop--parkville">
+          <div
+            class="route-stop route-stop--parkville"
+          >
             <span aria-hidden="true"></span>
             Parkville
           </div>
 
-          <div class="route-stop route-stop--carlton">
+          <div
+            class="route-stop route-stop--carlton"
+          >
             <span aria-hidden="true"></span>
             Carlton
           </div>
 
-          <div class="route-stop route-stop--richmond">
+          <div
+            class="route-stop route-stop--richmond"
+          >
             <span aria-hidden="true"></span>
             Richmond
           </div>
 
-          <div class="route-stop route-stop--stkilda">
+          <div
+            class="route-stop route-stop--stkilda"
+          >
             <span aria-hidden="true"></span>
             St Kilda
           </div>
@@ -158,7 +323,6 @@ function chooseActivity(activity) {
       </div>
     </section>
 
-    <!-- Featured activities -->
     <section
       class="featured-section"
       aria-labelledby="featured-title"
@@ -175,23 +339,30 @@ function chooseActivity(activity) {
             </h2>
 
             <p>
-              Beginner-friendly activities selected from
-              the PlayPath Melbourne community directory.
+              Beginner-friendly activities selected
+              from the PlayPath Melbourne community
+              directory.
             </p>
           </div>
 
-          <a
-            class="section-link"
-            href="#activities"
+          <button
+            class="section-link page-link-button"
+            type="button"
+            @click="
+              displayPage('activities')
+            "
           >
             View full directory
-            <span aria-hidden="true">↘</span>
-          </a>
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
 
         <div class="featured-grid">
           <article
-            v-for="(activity, index) in featuredActivities"
+            v-for="(
+              activity,
+              index
+            ) in featuredActivities"
             :key="activity.id"
             class="featured-card"
           >
@@ -211,7 +382,8 @@ function chooseActivity(activity) {
                 class="activity-status"
                 :class="{
                   'activity-status--limited':
-                    activity.status === 'Limited',
+                    activity.status ===
+                    'Limited',
                 }"
               >
                 {{ activity.status }}
@@ -220,17 +392,25 @@ function chooseActivity(activity) {
 
             <h3>{{ activity.name }}</h3>
 
-            <p>{{ activity.description }}</p>
+            <p>
+              {{ activity.description }}
+            </p>
 
             <dl class="featured-card__details">
               <div>
                 <dt>Date</dt>
-                <dd>{{ activity.dateLabel }}</dd>
+
+                <dd>
+                  {{ activity.dateLabel }}
+                </dd>
               </div>
 
               <div>
                 <dt>Suburb</dt>
-                <dd>{{ activity.suburb }}</dd>
+
+                <dd>
+                  {{ activity.suburb }}
+                </dd>
               </div>
 
               <div>
@@ -249,7 +429,9 @@ function chooseActivity(activity) {
             <button
               class="arrow-button"
               type="button"
-              @click="chooseActivity(activity)"
+              @click="
+                chooseActivity(activity)
+              "
             >
               Register interest
               <span aria-hidden="true">→</span>
@@ -259,13 +441,6 @@ function chooseActivity(activity) {
       </div>
     </section>
 
-    <!-- Dynamic activity directory -->
-    <ActivityDirectory
-      :activities="activities"
-      @select="chooseActivity"
-    />
-
-    <!-- Community impact -->
     <section
       class="impact-section"
       aria-labelledby="impact-title"
@@ -277,8 +452,8 @@ function chooseActivity(activity) {
           </p>
 
           <h2 id="impact-title">
-            One local journey can create three kinds of
-            change.
+            One local journey can create three kinds
+            of change.
           </h2>
         </div>
 
@@ -294,8 +469,9 @@ function chooseActivity(activity) {
             <h3>Climate</h3>
 
             <p>
-              Replace short private-car trips with walking,
-              cycling and shared community journeys.
+              Replace short private-car trips with
+              walking, cycling and shared community
+              journeys.
             </p>
           </article>
 
@@ -310,8 +486,8 @@ function chooseActivity(activity) {
             <h3>Community</h3>
 
             <p>
-              Meet neighbours, volunteers and local clubs
-              through welcoming activities.
+              Meet neighbours, volunteers and local
+              clubs through welcoming activities.
             </p>
           </article>
 
@@ -333,24 +509,81 @@ function chooseActivity(activity) {
         </div>
       </div>
     </section>
+  </main>
 
-    <!-- Validated form -->
-    <GetInvolvedForm
+  <!-- Explore page -->
+  <main
+    v-else-if="
+      currentPage === 'activities'
+    "
+    id="main-content"
+    tabindex="-1"
+  >
+    <ActivityDirectory
       :activities="activities"
-      :selected-activity-id="selectedActivityId"
+      @select="chooseActivity"
     />
   </main>
 
-  <!-- Footer -->
+  <!-- Ratings page -->
+  <main
+    v-else-if="
+      currentPage === 'ratings'
+    "
+    id="main-content"
+    tabindex="-1"
+  >
+    <RatingPanel />
+  </main>
+
+  <!-- Get involved page -->
+  <main
+    v-else-if="
+      currentPage === 'get-involved'
+    "
+    id="main-content"
+    tabindex="-1"
+  >
+    <GetInvolvedForm
+      :activities="activities"
+      :selected-activity-id="
+        selectedActivityId
+      "
+    />
+  </main>
+
+  <!-- Account page -->
+  <main
+    v-else-if="
+      currentPage === 'account'
+    "
+    id="main-content"
+    tabindex="-1"
+  >
+    <AuthPanel />
+  </main>
+
+  <!-- Administrator page -->
+  <main
+    v-else-if="
+      currentPage === 'admin'
+    "
+    id="main-content"
+    tabindex="-1"
+  >
+    <AdminDashboard />
+  </main>
+
   <footer class="site-footer">
     <div class="site-container site-footer__layout">
       <div>
-        <a
-          class="footer-brand"
-          href="#home"
+        <button
+          class="footer-brand footer-link-button"
+          type="button"
+          @click="displayPage('home')"
         >
           PlayPath Melbourne
-        </a>
+        </button>
 
         <p>
           Climate action through community sport and
@@ -359,9 +592,37 @@ function chooseActivity(activity) {
       </div>
 
       <nav aria-label="Footer navigation">
-        <a href="#home">Home</a>
-        <a href="#activities">Explore</a>
-        <a href="#get-involved">Get involved</a>
+        <button
+          type="button"
+          @click="displayPage('home')"
+        >
+          Home
+        </button>
+
+        <button
+          type="button"
+          @click="
+            displayPage('activities')
+          "
+        >
+          Explore
+        </button>
+
+        <button
+          type="button"
+          @click="displayPage('ratings')"
+        >
+          Ratings
+        </button>
+
+        <button
+          type="button"
+          @click="
+            displayPage('get-involved')
+          "
+        >
+          Get involved
+        </button>
       </nav>
 
       <p class="site-footer__copyright">
@@ -370,3 +631,39 @@ function chooseActivity(activity) {
     </div>
   </footer>
 </template>
+
+<style scoped>
+.page-link-button,
+.footer-link-button,
+.site-footer nav button {
+  padding: 0;
+
+  color: inherit;
+  background: transparent;
+  border: 0;
+
+  font: inherit;
+  cursor: pointer;
+}
+
+.page-link-button {
+  color: var(--primary);
+  font-weight: 900;
+  text-decoration: underline;
+}
+
+.footer-link-button {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.site-footer nav button {
+  color: #dedbea;
+  text-decoration: underline;
+}
+
+#main-content:focus {
+  outline: none;
+}
+</style>
