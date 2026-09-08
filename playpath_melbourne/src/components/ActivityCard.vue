@@ -10,18 +10,11 @@ const props = defineProps({
 
 defineEmits(['select'])
 
-const activityClass = computed(() =>
-  props.activity.type
-    .toLowerCase()
-    .replaceAll(' ', '-'),
-)
+const activityClass = computed(() => props.activity.type.toLowerCase().replaceAll(' ', '-'))
 </script>
 
 <template>
-  <article
-    class="activity-card"
-    :class="`activity-card--${activityClass}`"
-  >
+  <article class="activity-card" :class="`activity-card--${activityClass}`">
     <div class="activity-card__route"></div>
 
     <div class="activity-card__top">
@@ -32,8 +25,7 @@ const activityClass = computed(() =>
       <span
         class="activity-status"
         :class="{
-          'activity-status--limited':
-            activity.status === 'Limited',
+          'activity-status--limited': activity.status === 'Limited',
         }"
       >
         {{ activity.status }}
@@ -63,11 +55,7 @@ const activityClass = computed(() =>
       <div>
         <dt>Cost</dt>
         <dd>
-          {{
-            activity.cost === 0
-              ? 'Free'
-              : `$${activity.cost}`
-          }}
+          {{ activity.cost === 0 ? 'Free' : `$${activity.cost}` }}
         </dd>
       </div>
 

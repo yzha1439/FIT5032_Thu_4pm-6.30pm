@@ -49,9 +49,7 @@ defineEmits([
 <template>
   <div class="filter-panel">
     <div class="filter-panel__search">
-      <label for="activity-search">
-        Search all activities
-      </label>
+      <label for="activity-search"> Search all activities </label>
 
       <div class="search-control">
         <span aria-hidden="true">⌕</span>
@@ -61,9 +59,7 @@ defineEmits([
           :value="search"
           type="search"
           placeholder="Search by activity, club or suburb"
-          @input="
-            $emit('update:search', $event.target.value)
-          "
+          @input="$emit('update:search', $event.target.value)"
         />
       </div>
     </div>
@@ -73,120 +69,71 @@ defineEmits([
 
       <div class="filter-grid">
         <div class="field-group">
-          <label for="suburb-filter">
-            Suburb
-          </label>
+          <label for="suburb-filter"> Suburb </label>
 
           <select
             id="suburb-filter"
             :value="suburb"
-            @change="
-              $emit('update:suburb', $event.target.value)
-            "
+            @change="$emit('update:suburb', $event.target.value)"
           >
-            <option value="All">
-              All suburbs
-            </option>
+            <option value="All">All suburbs</option>
 
-            <option
-              v-for="item in suburbs"
-              :key="item"
-              :value="item"
-            >
+            <option v-for="item in suburbs" :key="item" :value="item">
               {{ item }}
             </option>
           </select>
         </div>
 
         <div class="field-group">
-          <label for="type-filter">
-            Activity type
-          </label>
+          <label for="type-filter"> Activity type </label>
 
           <select
             id="type-filter"
             :value="type"
-            @change="
-              $emit('update:type', $event.target.value)
-            "
+            @change="$emit('update:type', $event.target.value)"
           >
-            <option value="All">
-              All activity types
-            </option>
+            <option value="All">All activity types</option>
 
-            <option
-              v-for="item in types"
-              :key="item"
-              :value="item"
-            >
+            <option v-for="item in types" :key="item" :value="item">
               {{ item }}
             </option>
           </select>
         </div>
 
         <div class="field-group">
-          <label for="accessibility-filter">
-            Accessibility
-          </label>
+          <label for="accessibility-filter"> Accessibility </label>
 
           <select
             id="accessibility-filter"
             :value="accessibility"
-            @change="
-              $emit(
-                'update:accessibility',
-                $event.target.value,
-              )
-            "
+            @change="$emit('update:accessibility', $event.target.value)"
           >
-            <option value="All">
-              All options
-            </option>
+            <option value="All">All options</option>
 
-            <option value="Yes">
-              Fully accessible
-            </option>
+            <option value="Yes">Fully accessible</option>
 
-            <option value="Partial">
-              Partially accessible
-            </option>
+            <option value="Partial">Partially accessible</option>
           </select>
         </div>
 
         <div class="field-group">
-          <label for="cost-filter">
-            Cost
-          </label>
+          <label for="cost-filter"> Cost </label>
 
           <select
             id="cost-filter"
             :value="cost"
-            @change="
-              $emit('update:cost', $event.target.value)
-            "
+            @change="$emit('update:cost', $event.target.value)"
           >
-            <option value="All">
-              Any cost
-            </option>
+            <option value="All">Any cost</option>
 
-            <option value="Free">
-              Free
-            </option>
+            <option value="Free">Free</option>
 
-            <option value="Paid">
-              Paid
-            </option>
+            <option value="Paid">Paid</option>
           </select>
         </div>
       </div>
     </fieldset>
 
-    <button
-      class="clear-button"
-      type="button"
-      @click="$emit('clear')"
-    >
-      Clear all filters
-    </button>
+    <button class="clear-button" type="button" @click="$emit('clear')">Clear all filters</button>
   </div>
 </template>
