@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import ActivityRating from './ActivityRating.vue'
 
 const props = defineProps({
   activity: {
@@ -77,5 +78,7 @@ const activityClass = computed(() => props.activity.type.toLowerCase().replaceAl
     >
       Register interest
     </button>
+
+    <ActivityRating :activity="activity" />
   </article>
 </template>

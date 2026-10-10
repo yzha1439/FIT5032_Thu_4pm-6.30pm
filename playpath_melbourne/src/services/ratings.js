@@ -45,6 +45,10 @@ export function saveRating({ activityId, score, review, user }) {
     throw new Error('Sign in before rating an activity.')
   }
 
+  if (user.role !== 'member') {
+    throw new Error('Only standard member accounts can rate activities.')
+  }
+
   if (!isValidActivityId(activityId, activities)) {
     throw new Error('Select a valid activity.')
   }

@@ -1,10 +1,5 @@
 <script setup>
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import AppHeader from './components/AppHeader.vue'
 import ActivityDirectory from './components/ActivityDirectory.vue'
@@ -18,49 +13,23 @@ import { useAuth } from './services/auth.js'
 
 const { isAdmin } = useAuth()
 
-const validPages = [
-  'home',
-  'activities',
-  'ratings',
-  'get-involved',
-  'account',
-  'admin',
-]
+const validPages = ['home', 'activities', 'ratings', 'get-involved', 'account', 'admin']
 
 const currentPage = ref('home')
 const selectedActivityId = ref('')
 
-const featuredActivities = computed(() =>
-  activities.filter(
-    (activity) => activity.featured,
-  ),
-)
+const featuredActivities = computed(() => activities.filter((activity) => activity.featured))
 
-const suburbCount = computed(
-  () =>
-    new Set(
-      activities.map(
-        (activity) => activity.suburb,
-      ),
-    ).size,
-)
+const suburbCount = computed(() => new Set(activities.map((activity) => activity.suburb)).size)
 
 const freeActivityCount = computed(
-  () =>
-    activities.filter(
-      (activity) => activity.cost === 0,
-    ).length,
+  () => activities.filter((activity) => activity.cost === 0).length,
 )
 
 function pageFromAddress() {
-  const page =
-    window.location.hash
-      .replace(/^#/, '')
-      .trim() || 'home'
+  const page = window.location.hash.replace(/^#/, '').trim() || 'home'
 
-  return validPages.includes(page)
-    ? page
-    : 'home'
+  return validPages.includes(page) ? page : 'home'
 }
 
 function allowedPage(page) {
@@ -70,25 +39,15 @@ function allowedPage(page) {
    *
    * Only administrators may view Admin.
    */
-  if (
-    page === 'admin' &&
-    !isAdmin.value
-  ) {
+  if (page === 'admin' && !isAdmin.value) {
     return 'account'
   }
 
   return page
 }
 
-function displayPage(
-  requestedPage,
-  addHistory = true,
-) {
-  const safePage = validPages.includes(
-    requestedPage,
-  )
-    ? requestedPage
-    : 'home'
+function displayPage(requestedPage, addHistory = true) {
+  const safePage = validPages.includes(requestedPage) ? requestedPage : 'home'
 
   const nextPage = allowedPage(safePage)
 
@@ -96,10 +55,7 @@ function displayPage(
 
   const nextAddress = `#${nextPage}`
 
-  if (
-    addHistory &&
-    window.location.hash !== nextAddress
-  ) {
+  if (addHistory && window.location.hash !== nextAddress) {
     window.history.pushState(
       {
         page: nextPage,
@@ -120,112 +76,67 @@ function displayPage(
       behavior: 'auto',
     })
 
-    document
-      .querySelector('#main-content')
-      ?.focus({
-        preventScroll: true,
-      })
+    document.querySelector('#main-content')?.focus({
+      preventScroll: true,
+    })
   })
 }
 
 function handleHistoryChange() {
-  displayPage(
-    pageFromAddress(),
-    false,
-  )
+  displayPage(pageFromAddress(), false)
 }
 
 function chooseActivity(activity) {
-  selectedActivityId.value =
-    String(activity.id)
+  selectedActivityId.value = String(activity.id)
 
   displayPage('get-involved')
 }
 
 onMounted(() => {
-  displayPage(
-    pageFromAddress(),
-    false,
-  )
+  displayPage(pageFromAddress(), false)
 
-  window.addEventListener(
-    'popstate',
-    handleHistoryChange,
-  )
+  window.addEventListener('popstate', handleHistoryChange)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener(
-    'popstate',
-    handleHistoryChange,
-  )
+  window.removeEventListener('popstate', handleHistoryChange)
 })
 </script>
 
 <template>
-  <AppHeader
-    :current-page="currentPage"
-    @navigate="displayPage"
-  />
+  <AppHeader :current-page="currentPage" @navigate="displayPage" />
 
   <!-- Home page -->
-  <main
-    v-if="currentPage === 'home'"
-    id="main-content"
-    tabindex="-1"
-  >
-    <section
-      class="hero"
-      aria-labelledby="hero-title"
-    >
-      <div
-        class="hero__shape hero__shape--one"
-        aria-hidden="true"
-      ></div>
+  <main v-if="currentPage === 'home'" id="main-content" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__shape hero__shape--one" aria-hidden="true"></div>
 
-      <div
-        class="hero__shape hero__shape--two"
-        aria-hidden="true"
-      ></div>
+      <div class="hero__shape hero__shape--two" aria-hidden="true"></div>
 
       <div class="site-container hero__layout">
         <div class="hero__content">
-          <p class="eyebrow eyebrow--light">
-            Melbourne moves differently
-          </p>
+          <p class="eyebrow eyebrow--light">Melbourne moves differently</p>
 
           <h1 id="hero-title">
             Move through the city.
 
-            <span>
-              Change how it moves.
-            </span>
+            <span> Change how it moves. </span>
           </h1>
 
           <p class="hero__lead">
-            Discover affordable community sport,
-            walking groups and social rides while
-            supporting healthier, lower-emission
-            journeys across Melbourne.
+            Discover affordable community sport, walking groups and social rides while supporting
+            healthier, lower-emission journeys across Melbourne.
           </p>
 
           <div class="hero__actions">
-            <button
-              class="button button--primary"
-              type="button"
-              @click="
-                displayPage('activities')
-              "
-            >
+            <button class="button button--primary" type="button" @click="displayPage('activities')">
               Explore local activities
             </button>
 
             <button
               class="button button--outline-light"
               type="button"
-              @click="
-                displayPage('get-involved')
-              "
+              @click="displayPage('get-involved')"
             >
               Get involved
             </button>
@@ -261,96 +172,62 @@ onBeforeUnmount(() => {
         >
           <div class="route-map__heading">
             <span>PlayPath route</span>
-            <strong>
-              Melbourne network
-            </strong>
+            <strong> Melbourne network </strong>
           </div>
 
-          <div
-            class="route-line route-line--purple"
-            aria-hidden="true"
-          ></div>
+          <div class="route-line route-line--purple" aria-hidden="true"></div>
 
-          <div
-            class="route-line route-line--coral"
-            aria-hidden="true"
-          ></div>
+          <div class="route-line route-line--coral" aria-hidden="true"></div>
 
-          <div
-            class="route-line route-line--lime"
-            aria-hidden="true"
-          ></div>
+          <div class="route-line route-line--lime" aria-hidden="true"></div>
 
-          <div
-            class="route-stop route-stop--footscray"
-          >
+          <div class="route-stop route-stop--footscray">
             <span aria-hidden="true"></span>
             Footscray
           </div>
 
-          <div
-            class="route-stop route-stop--parkville"
-          >
+          <div class="route-stop route-stop--parkville">
             <span aria-hidden="true"></span>
             Parkville
           </div>
 
-          <div
-            class="route-stop route-stop--carlton"
-          >
+          <div class="route-stop route-stop--carlton">
             <span aria-hidden="true"></span>
             Carlton
           </div>
 
-          <div
-            class="route-stop route-stop--richmond"
-          >
+          <div class="route-stop route-stop--richmond">
             <span aria-hidden="true"></span>
             Richmond
           </div>
 
-          <div
-            class="route-stop route-stop--stkilda"
-          >
+          <div class="route-stop route-stop--stkilda">
             <span aria-hidden="true"></span>
             St Kilda
           </div>
 
-          <p class="route-map__note">
-            Community sport · Walking · Cycling
-          </p>
+          <p class="route-map__note">Community sport · Walking · Cycling</p>
         </div>
       </div>
     </section>
 
-    <section
-      class="featured-section"
-      aria-labelledby="featured-title"
-    >
+    <section class="featured-section" aria-labelledby="featured-title">
       <div class="site-container section">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">
-              Featured this month
-            </p>
+            <p class="eyebrow">Featured this month</p>
 
-            <h2 id="featured-title">
-              Three ways to start moving
-            </h2>
+            <h2 id="featured-title">Three ways to start moving</h2>
 
             <p>
-              Beginner-friendly activities selected
-              from the PlayPath Melbourne community
-              directory.
+              Beginner-friendly activities selected from the PlayPath Melbourne community directory.
             </p>
           </div>
 
           <button
             class="section-link page-link-button"
             type="button"
-            @click="
-              displayPage('activities')
-            "
+            @click="displayPage('activities')"
           >
             View full directory
             <span aria-hidden="true">→</span>
@@ -359,19 +236,11 @@ onBeforeUnmount(() => {
 
         <div class="featured-grid">
           <article
-            v-for="(
-              activity,
-              index
-            ) in featuredActivities"
+            v-for="(activity, index) in featuredActivities"
             :key="activity.id"
             class="featured-card"
           >
-            <div
-              class="featured-card__number"
-              aria-hidden="true"
-            >
-              0{{ index + 1 }}
-            </div>
+            <div class="featured-card__number" aria-hidden="true">0{{ index + 1 }}</div>
 
             <div class="featured-card__header">
               <span class="activity-type">
@@ -381,9 +250,7 @@ onBeforeUnmount(() => {
               <span
                 class="activity-status"
                 :class="{
-                  'activity-status--limited':
-                    activity.status ===
-                    'Limited',
+                  'activity-status--limited': activity.status === 'Limited',
                 }"
               >
                 {{ activity.status }}
@@ -417,22 +284,12 @@ onBeforeUnmount(() => {
                 <dt>Cost</dt>
 
                 <dd>
-                  {{
-                    activity.cost === 0
-                      ? 'Free'
-                      : `$${activity.cost}`
-                  }}
+                  {{ activity.cost === 0 ? 'Free' : `$${activity.cost}` }}
                 </dd>
               </div>
             </dl>
 
-            <button
-              class="arrow-button"
-              type="button"
-              @click="
-                chooseActivity(activity)
-              "
-            >
+            <button class="arrow-button" type="button" @click="chooseActivity(activity)">
               Register interest
               <span aria-hidden="true">→</span>
             </button>
@@ -441,70 +298,39 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section
-      class="impact-section"
-      aria-labelledby="impact-title"
-    >
+    <section class="impact-section" aria-labelledby="impact-title">
       <div class="site-container section">
         <div class="impact-section__heading">
-          <p class="eyebrow eyebrow--light">
-            Why active travel?
-          </p>
+          <p class="eyebrow eyebrow--light">Why active travel?</p>
 
-          <h2 id="impact-title">
-            One local journey can create three kinds
-            of change.
-          </h2>
+          <h2 id="impact-title">One local journey can create three kinds of change.</h2>
         </div>
 
         <div class="impact-grid">
           <article>
-            <span
-              class="impact-grid__number"
-              aria-hidden="true"
-            >
-              01
-            </span>
+            <span class="impact-grid__number" aria-hidden="true"> 01 </span>
 
             <h3>Climate</h3>
 
             <p>
-              Replace short private-car trips with
-              walking, cycling and shared community
-              journeys.
+              Replace short private-car trips with walking, cycling and shared community journeys.
             </p>
           </article>
 
           <article>
-            <span
-              class="impact-grid__number"
-              aria-hidden="true"
-            >
-              02
-            </span>
+            <span class="impact-grid__number" aria-hidden="true"> 02 </span>
 
             <h3>Community</h3>
 
-            <p>
-              Meet neighbours, volunteers and local
-              clubs through welcoming activities.
-            </p>
+            <p>Meet neighbours, volunteers and local clubs through welcoming activities.</p>
           </article>
 
           <article>
-            <span
-              class="impact-grid__number"
-              aria-hidden="true"
-            >
-              03
-            </span>
+            <span class="impact-grid__number" aria-hidden="true"> 03 </span>
 
             <h3>Wellbeing</h3>
 
-            <p>
-              Make regular movement more accessible,
-              social and enjoyable.
-            </p>
+            <p>Make regular movement more accessible, social and enjoyable.</p>
           </article>
         </div>
       </div>
@@ -512,122 +338,51 @@ onBeforeUnmount(() => {
   </main>
 
   <!-- Explore page -->
-  <main
-    v-else-if="
-      currentPage === 'activities'
-    "
-    id="main-content"
-    tabindex="-1"
-  >
-    <ActivityDirectory
-      :activities="activities"
-      @select="chooseActivity"
-    />
+  <main v-else-if="currentPage === 'activities'" id="main-content" tabindex="-1">
+    <ActivityDirectory :activities="activities" @select="chooseActivity" />
   </main>
 
   <!-- Ratings page -->
-  <main
-    v-else-if="
-      currentPage === 'ratings'
-    "
-    id="main-content"
-    tabindex="-1"
-  >
+  <main v-else-if="currentPage === 'ratings'" id="main-content" tabindex="-1">
     <RatingPanel />
   </main>
 
   <!-- Get involved page -->
-  <main
-    v-else-if="
-      currentPage === 'get-involved'
-    "
-    id="main-content"
-    tabindex="-1"
-  >
-    <GetInvolvedForm
-      :activities="activities"
-      :selected-activity-id="
-        selectedActivityId
-      "
-    />
+  <main v-else-if="currentPage === 'get-involved'" id="main-content" tabindex="-1">
+    <GetInvolvedForm :activities="activities" :selected-activity-id="selectedActivityId" />
   </main>
 
   <!-- Account page -->
-  <main
-    v-else-if="
-      currentPage === 'account'
-    "
-    id="main-content"
-    tabindex="-1"
-  >
+  <main v-else-if="currentPage === 'account'" id="main-content" tabindex="-1">
     <AuthPanel />
   </main>
 
   <!-- Administrator page -->
-  <main
-    v-else-if="
-      currentPage === 'admin'
-    "
-    id="main-content"
-    tabindex="-1"
-  >
+  <main v-else-if="currentPage === 'admin'" id="main-content" tabindex="-1">
     <AdminDashboard />
   </main>
 
   <footer class="site-footer">
     <div class="site-container site-footer__layout">
       <div>
-        <button
-          class="footer-brand footer-link-button"
-          type="button"
-          @click="displayPage('home')"
-        >
+        <button class="footer-brand footer-link-button" type="button" @click="displayPage('home')">
           PlayPath Melbourne
         </button>
 
-        <p>
-          Climate action through community sport and
-          active travel.
-        </p>
+        <p>Climate action through community sport and active travel.</p>
       </div>
 
       <nav aria-label="Footer navigation">
-        <button
-          type="button"
-          @click="displayPage('home')"
-        >
-          Home
-        </button>
+        <button type="button" @click="displayPage('home')">Home</button>
 
-        <button
-          type="button"
-          @click="
-            displayPage('activities')
-          "
-        >
-          Explore
-        </button>
+        <button type="button" @click="displayPage('activities')">Explore</button>
 
-        <button
-          type="button"
-          @click="displayPage('ratings')"
-        >
-          Ratings
-        </button>
+        <button type="button" @click="displayPage('ratings')">Ratings</button>
 
-        <button
-          type="button"
-          @click="
-            displayPage('get-involved')
-          "
-        >
-          Get involved
-        </button>
+        <button type="button" @click="displayPage('get-involved')">Get involved</button>
       </nav>
 
-      <p class="site-footer__copyright">
-        © 2026 PlayPath Melbourne
-      </p>
+      <p class="site-footer__copyright">© 2026 PlayPath Melbourne</p>
     </div>
   </footer>
 </template>

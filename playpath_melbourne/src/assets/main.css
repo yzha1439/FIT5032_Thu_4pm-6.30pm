@@ -830,6 +830,17 @@ textarea[aria-invalid='true'] {
   cursor: pointer;
 }
 
+.rating-table-cell {
+  min-width: 260px;
+  vertical-align: top;
+}
+
+.rating-table-cell summary {
+  color: var(--primary-dark);
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .activity-cards {
   display: grid;
   gap: 1.25rem;

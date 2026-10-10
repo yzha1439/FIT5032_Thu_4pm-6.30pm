@@ -84,6 +84,24 @@ The design includes:
 - A Community Pass-inspired form
 - Persistent form labels and visible keyboard focus states
 
+## A3 BR D.1: External Authentication
+
+Firebase Authentication provides:
+
+- Email/password registration and sign-in
+- Google sign-in
+- Persistent browser sessions
+- Email verification and resend
+- Password reset
+- Friendly authentication errors
+
+Each authenticated user has a Firestore profile containing only name, email, role and creation
+time. Public registration always creates the `member` role. Firestore Security Rules prevent users
+from assigning themselves administrator access; only an existing administrator may change roles.
+
+Before testing, enable Email/Password and Google in Firebase Authentication, create a Firestore
+database, and publish the supplied `firestore.rules`.
+
 ## Project Setup
 
 Install dependencies:

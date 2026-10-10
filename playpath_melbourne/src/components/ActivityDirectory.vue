@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
+import ActivityRating from './ActivityRating.vue'
 
 const props = defineProps({
   activities: {
@@ -109,6 +110,7 @@ function clearFilters() {
               <th scope="col">Type</th>
               <th scope="col">Cost</th>
               <th scope="col">Access</th>
+              <th scope="col">Rating</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -129,6 +131,13 @@ function clearFilters() {
               </td>
 
               <td>{{ activity.accessibility }}</td>
+
+              <td class="rating-table-cell">
+                <details>
+                  <summary>Rate activity</summary>
+                  <ActivityRating :activity="activity" />
+                </details>
+              </td>
 
               <td>
                 <button class="table-action" type="button" @click="$emit('select', activity)">

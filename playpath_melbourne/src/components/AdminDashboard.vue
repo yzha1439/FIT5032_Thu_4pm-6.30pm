@@ -1,17 +1,31 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getPublicUsers, useAuth } from '../services/auth.js'
 import { activities } from '../data/activities.js'
 
 const { currentUser, isAdmin } = useAuth()
 
-const users = computed(() => {
-  if (!isAdmin.value) {
-    return []
-  }
+const users = ref([])
+const loadingUsers = ref(false)
+const userError = ref('')
 
-  return getPublicUsers()
-})
+watch(
+  isAdmin,
+  async (admin) => {
+    users.value = []
+    userError.value = ''
+    if (!admin) return
+    loadingUsers.value = true
+    try {
+      users.value = await getPublicUsers()
+    } catch {
+      userError.value = 'User accounts could not be loaded from Firestore.'
+    } finally {
+      loadingUsers.value = false
+    }
+  },
+  { immediate: true },
+)
 
 const memberCount = computed(() => users.value.filter((user) => user.role === 'member').length)
 
@@ -61,7 +75,10 @@ const adminCount = computed(() => users.value.filter((user) => user.role === 'ad
         <div class="user-list">
           <h3>User accounts</h3>
 
-          <div class="user-table-wrapper">
+          <p v-if="loadingUsers" role="status">Loading user accounts...</p>
+          <p v-else-if="userError" class="user-error" role="alert">{{ userError }}</p>
+
+          <div v-else class="user-table-wrapper">
             <table class="user-table">
               <caption class="sr-only">
                 Registered PlayPath user accounts
@@ -194,6 +211,11 @@ const adminCount = computed(() => users.value.filter((user) => user.role === 'ad
 
 .user-table-wrapper {
   overflow-x: auto;
+}
+
+.user-error {
+  color: var(--error);
+  font-weight: 800;
 }
 
 .user-table {
