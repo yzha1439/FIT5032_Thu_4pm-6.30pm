@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
 import ActivityRating from './ActivityRating.vue'
@@ -18,6 +18,11 @@ const suburb = ref('All')
 const type = ref('All')
 const accessibility = ref('All')
 const cost = ref('All')
+const sortKey = ref('date')
+const sortDirection = ref('asc')
+const currentPage = ref(1)
+const rowsPerPage = 10
+const collator = new Intl.Collator('en-AU', { numeric: true, sensitivity: 'base' })
 
 const suburbs = computed(() =>
   [...new Set(props.activities.map((activity) => activity.suburb))].sort(),
@@ -49,12 +54,70 @@ const filteredActivities = computed(() => {
   })
 })
 
+const sortedActivities = computed(() =>
+  [...filteredActivities.value].sort((first, second) => {
+    const firstValue = first[sortKey.value]
+    const secondValue = second[sortKey.value]
+    const comparison =
+      typeof firstValue === 'number' && typeof secondValue === 'number'
+        ? firstValue - secondValue
+        : collator.compare(String(firstValue), String(secondValue))
+
+    return sortDirection.value === 'asc' ? comparison : -comparison
+  }),
+)
+
+const pageCount = computed(() =>
+  Math.max(1, Math.ceil(sortedActivities.value.length / rowsPerPage)),
+)
+
+const paginatedActivities = computed(() => {
+  const start = (currentPage.value - 1) * rowsPerPage
+  return sortedActivities.value.slice(start, start + rowsPerPage)
+})
+
+const resultRange = computed(() => {
+  if (!sortedActivities.value.length) return '0 results'
+  const start = (currentPage.value - 1) * rowsPerPage + 1
+  const end = Math.min(start + rowsPerPage - 1, sortedActivities.value.length)
+  return `${start}-${end} of ${sortedActivities.value.length}`
+})
+
+watch([search, suburb, type, accessibility, cost], () => {
+  currentPage.value = 1
+})
+
+watch(pageCount, (pages) => {
+  if (currentPage.value > pages) currentPage.value = pages
+})
+
+function sortBy(key) {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortDirection.value = 'asc'
+  }
+  currentPage.value = 1
+}
+
+function ariaSort(key) {
+  if (sortKey.value !== key) return 'none'
+  return sortDirection.value === 'asc' ? 'ascending' : 'descending'
+}
+
+function sortIndicator(key) {
+  if (sortKey.value !== key) return '↕'
+  return sortDirection.value === 'asc' ? '↑' : '↓'
+}
+
 function clearFilters() {
   search.value = ''
   suburb.value = 'All'
   type.value = 'All'
   accessibility.value = 'All'
   cost.value = 'All'
+  currentPage.value = 1
 }
 </script>
 
@@ -104,19 +167,43 @@ function clearFilters() {
 
           <thead>
             <tr>
-              <th scope="col">Activity</th>
-              <th scope="col">Date</th>
-              <th scope="col">Suburb</th>
-              <th scope="col">Type</th>
-              <th scope="col">Cost</th>
-              <th scope="col">Access</th>
+              <th scope="col" :aria-sort="ariaSort('name')">
+                <button class="sort-button" type="button" @click="sortBy('name')">
+                  Activity <span aria-hidden="true">{{ sortIndicator('name') }}</span>
+                </button>
+              </th>
+              <th scope="col" :aria-sort="ariaSort('date')">
+                <button class="sort-button" type="button" @click="sortBy('date')">
+                  Date <span aria-hidden="true">{{ sortIndicator('date') }}</span>
+                </button>
+              </th>
+              <th scope="col" :aria-sort="ariaSort('suburb')">
+                <button class="sort-button" type="button" @click="sortBy('suburb')">
+                  Suburb <span aria-hidden="true">{{ sortIndicator('suburb') }}</span>
+                </button>
+              </th>
+              <th scope="col" :aria-sort="ariaSort('type')">
+                <button class="sort-button" type="button" @click="sortBy('type')">
+                  Type <span aria-hidden="true">{{ sortIndicator('type') }}</span>
+                </button>
+              </th>
+              <th scope="col" :aria-sort="ariaSort('cost')">
+                <button class="sort-button" type="button" @click="sortBy('cost')">
+                  Cost <span aria-hidden="true">{{ sortIndicator('cost') }}</span>
+                </button>
+              </th>
+              <th scope="col" :aria-sort="ariaSort('accessibility')">
+                <button class="sort-button" type="button" @click="sortBy('accessibility')">
+                  Access <span aria-hidden="true">{{ sortIndicator('accessibility') }}</span>
+                </button>
+              </th>
               <th scope="col">Rating</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="activity in filteredActivities" :key="activity.id">
+            <tr v-for="activity in paginatedActivities" :key="activity.id">
               <td>
                 <strong>{{ activity.name }}</strong>
                 <small>{{ activity.club }}</small>
@@ -151,12 +238,29 @@ function clearFilters() {
 
       <div v-if="filteredActivities.length" class="activity-cards">
         <ActivityCard
-          v-for="activity in filteredActivities"
+          v-for="activity in paginatedActivities"
           :key="activity.id"
           :activity="activity"
           @select="$emit('select', $event)"
         />
       </div>
+
+      <nav
+        v-if="filteredActivities.length"
+        class="table-pagination"
+        aria-label="Activity results pages"
+      >
+        <p aria-live="polite">Showing {{ resultRange }}</p>
+        <div>
+          <button type="button" :disabled="currentPage === 1" @click="currentPage -= 1">
+            Previous
+          </button>
+          <span>Page {{ currentPage }} of {{ pageCount }}</span>
+          <button type="button" :disabled="currentPage === pageCount" @click="currentPage += 1">
+            Next
+          </button>
+        </div>
+      </nav>
 
       <div v-else class="empty-state">
         <span class="empty-state__symbol" aria-hidden="true"> ↯ </span>
