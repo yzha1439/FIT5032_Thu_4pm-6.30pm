@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
 import ActivityRating from './ActivityRating.vue'
+import ExportActions from './ExportActions.vue'
 
 const props = defineProps({
   activities: {
@@ -23,6 +24,15 @@ const sortDirection = ref('asc')
 const currentPage = ref(1)
 const rowsPerPage = 10
 const collator = new Intl.Collator('en-AU', { numeric: true, sensitivity: 'base' })
+const exportColumns = [
+  { key: 'activity', label: 'Activity', width: 2.2 },
+  { key: 'club', label: 'Organisation', width: 1.8 },
+  { key: 'date', label: 'Date', width: 1.2 },
+  { key: 'suburb', label: 'Suburb', width: 1.2 },
+  { key: 'type', label: 'Type', width: 1.2 },
+  { key: 'cost', label: 'Cost', width: 0.8 },
+  { key: 'access', label: 'Access', width: 1 },
+]
 
 const suburbs = computed(() =>
   [...new Set(props.activities.map((activity) => activity.suburb))].sort(),
@@ -75,6 +85,18 @@ const paginatedActivities = computed(() => {
   const start = (currentPage.value - 1) * rowsPerPage
   return sortedActivities.value.slice(start, start + rowsPerPage)
 })
+
+const exportRows = computed(() =>
+  sortedActivities.value.map((activity) => ({
+    activity: activity.name,
+    club: activity.club,
+    date: activity.dateLabel,
+    suburb: activity.suburb,
+    type: activity.type,
+    cost: activity.cost === 0 ? 'Free' : `$${activity.cost}`,
+    access: activity.accessibility,
+  })),
+)
 
 const resultRange = computed(() => {
   if (!sortedActivities.value.length) return '0 results'
@@ -158,6 +180,13 @@ function clearFilters() {
 
         <span class="results-heading__line"></span>
       </div>
+
+      <ExportActions
+        title="PlayPath Melbourne activity directory"
+        filename="playpath-activities"
+        :columns="exportColumns"
+        :rows="exportRows"
+      />
 
       <div v-if="filteredActivities.length" class="activity-table-wrapper">
         <table class="activity-table">

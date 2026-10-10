@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { getPublicUsers, useAuth } from '../services/auth.js'
 import { activities } from '../data/activities.js'
+import ExportActions from './ExportActions.vue'
 
 const { currentUser, isAdmin } = useAuth()
 
@@ -16,6 +17,11 @@ const sortDirection = ref('asc')
 const currentPage = ref(1)
 const rowsPerPage = 10
 const collator = new Intl.Collator('en-AU', { numeric: true, sensitivity: 'base' })
+const exportColumns = [
+  { key: 'name', label: 'Name', width: 1.5 },
+  { key: 'email', label: 'Email', width: 2.8 },
+  { key: 'role', label: 'Role', width: 1 },
+]
 
 watch(
   isAdmin,
@@ -64,6 +70,14 @@ const paginatedUsers = computed(() => {
   const start = (currentPage.value - 1) * rowsPerPage
   return sortedUsers.value.slice(start, start + rowsPerPage)
 })
+
+const exportRows = computed(() =>
+  sortedUsers.value.map((user) => ({
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  })),
+)
 
 const resultRange = computed(() => {
   if (!sortedUsers.value.length) return '0 users'
@@ -188,6 +202,13 @@ function clearUserFilters() {
               {{ filteredUsers.length }}
               {{ filteredUsers.length === 1 ? 'user found' : 'users found' }}
             </p>
+
+            <ExportActions
+              title="PlayPath Melbourne user accounts"
+              filename="playpath-user-accounts"
+              :columns="exportColumns"
+              :rows="exportRows"
+            />
 
             <div v-if="filteredUsers.length" class="user-table-wrapper">
               <table class="user-table">
