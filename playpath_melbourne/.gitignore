@@ -16,6 +16,9 @@ coverage
 .env
 .env.*
 !.env.example
+functions/.env
+functions/.env.*
+functions/node_modules
 
 # Editor directories and files
 .vscode/*

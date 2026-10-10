@@ -102,6 +102,34 @@ from assigning themselves administrator access; only an existing administrator m
 Before testing, enable Email/Password and Google in Firebase Authentication, create a Firestore
 database, and publish the supplied `firestore.rules`.
 
+## A3 BR D.2: Email with Attachment
+
+After a signed-in user creates a Community Pass, the application can send a confirmation email
+through the Resend API. The email contains an `.ics` calendar attachment for the selected
+activity. Delivery is implemented as a second-generation Firebase callable function so that API
+credentials are never included in the Vue bundle.
+
+The backend applies the following safeguards:
+
+- Firebase Authentication is required.
+- The account email must be verified.
+- The recipient must match the authenticated account email.
+- Input is validated and escaped on the server.
+- Each user is limited to one email per minute.
+- The Resend API key is stored as a Firebase secret.
+
+Create a Resend API key, then run:
+
+```bash
+firebase login
+firebase functions:secrets:set RESEND_API_KEY
+firebase deploy --only functions
+```
+
+The Firebase project must use the Blaze plan to deploy Cloud Functions. During testing, Resend's
+`onboarding@resend.dev` sender can deliver to the email address associated with the Resend account.
+Verify a custom domain before sending to other recipients in production.
+
 ## Project Setup
 
 Install dependencies:

@@ -1,5 +1,8 @@
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+
+import { useAuth } from '../services/auth.js'
+import { emailCommunityPass } from '../services/email.js'
 
 const props = defineProps({
   activities: {
@@ -20,6 +23,7 @@ const form = reactive({
   activityId: '',
   message: '',
   consent: false,
+  emailPass: true,
 })
 
 const errors = reactive({
@@ -32,6 +36,23 @@ const errors = reactive({
 })
 
 const successMessage = ref('')
+const submitError = ref('')
+const isSubmitting = ref(false)
+const { currentUser, isAuthenticated } = useAuth()
+
+const canEmailPass = computed(
+  () => isAuthenticated.value && Boolean(currentUser.value?.emailVerified),
+)
+
+watch(
+  currentUser,
+  (user) => {
+    if (!user) return
+    if (!form.fullName) form.fullName = user.name
+    if (!form.email) form.email = user.email
+  },
+  { immediate: true },
+)
 
 watch(
   () => props.selectedActivityId,
@@ -59,6 +80,12 @@ function validateForm() {
 
   if (!emailPattern.test(form.email.trim())) {
     errors.email = 'Enter a valid email address, such as name@example.com.'
+  } else if (
+    form.emailPass &&
+    canEmailPass.value &&
+    form.email.trim().toLowerCase() !== currentUser.value.email.toLowerCase()
+  ) {
+    errors.email = 'Use your verified account email to receive the attached pass.'
   }
 
   const postcodePattern = /^\d{4}$/
@@ -98,12 +125,13 @@ function saveRegistration() {
 
 function resetForm() {
   Object.assign(form, {
-    fullName: '',
-    email: '',
+    fullName: currentUser.value?.name || '',
+    email: currentUser.value?.email || '',
     postcode: '',
     activityId: '',
     message: '',
     consent: false,
+    emailPass: true,
   })
 }
 
@@ -113,20 +141,38 @@ function focusFirstError() {
   })
 }
 
-function submitForm() {
+async function submitForm() {
   successMessage.value = ''
+  submitError.value = ''
 
   if (!validateForm()) {
     focusFirstError()
     return
   }
 
-  saveRegistration()
+  const activity = props.activities.find((item) => String(item.id) === form.activityId)
+  const registration = { ...form }
 
-  successMessage.value = 'Your community pass has been saved successfully.'
+  isSubmitting.value = true
 
-  resetForm()
-  clearErrors()
+  try {
+    if (form.emailPass && canEmailPass.value) {
+      await emailCommunityPass({ ...registration, activity })
+      saveRegistration()
+      successMessage.value =
+        'Your pass was saved and emailed with a calendar attachment to your verified address.'
+    } else {
+      saveRegistration()
+      successMessage.value = 'Your community pass has been saved successfully.'
+    }
+
+    resetForm()
+    clearErrors()
+  } catch (error) {
+    submitError.value = error.message
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -167,6 +213,10 @@ function submitForm() {
             <strong>Pass created</strong>
             <span>{{ successMessage }}</span>
           </div>
+
+          <p v-if="submitError" class="delivery-error" role="alert">
+            {{ submitError }}
+          </p>
 
           <div class="form-grid">
             <div class="field-group">
@@ -312,13 +362,42 @@ function submitForm() {
             {{ errors.consent }}
           </p>
 
+          <div class="email-pass-option">
+            <div class="checkbox-group">
+              <input
+                id="email-pass"
+                v-model="form.emailPass"
+                type="checkbox"
+                :disabled="!canEmailPass"
+              />
+
+              <label for="email-pass">
+                Email this pass to my verified account with an activity calendar attachment.
+              </label>
+            </div>
+
+            <p v-if="!isAuthenticated" class="email-pass-option__help">
+              Sign in to securely send the pass by email.
+            </p>
+
+            <p v-else-if="!currentUser.emailVerified" class="email-pass-option__help">
+              Verify your account email before using email delivery.
+            </p>
+
+            <p v-else class="email-pass-option__help">
+              Delivery address: {{ currentUser.email }} · Attachment: activity-pass.ics
+            </p>
+          </div>
+
           <div class="interest-form__footer">
             <p>
               <span aria-hidden="true">*</span>
               Required field
             </p>
 
-            <button class="button button--coral" type="submit">Create community pass</button>
+            <button class="button button--coral" type="submit" :disabled="isSubmitting">
+              {{ isSubmitting ? 'Creating and sending…' : 'Create community pass' }}
+            </button>
           </div>
         </form>
       </div>
