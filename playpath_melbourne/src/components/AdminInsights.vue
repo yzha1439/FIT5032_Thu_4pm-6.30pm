@@ -36,6 +36,16 @@ const signupData = computed(() => {
 
   return rows.map(([month, value]) => ({ month, value, percent: (value / maximum) * 100 }))
 })
+
+const roleChartLabel = computed(() =>
+  roleData.value.map((item) => `${item.label}: ${item.value}`).join('. '),
+)
+
+const signupChartLabel = computed(() =>
+  signupData.value.length
+    ? signupData.value.map((item) => `${item.month}: ${item.value}`).join('. ')
+    : 'No monthly registration data is available.',
+)
 </script>
 
 <template>
@@ -58,7 +68,7 @@ const signupData = computed(() => {
     <div class="insight-grid" aria-live="polite">
       <figure v-if="chartView === 'roles'">
         <figcaption>Accounts by role</figcaption>
-        <div class="role-chart" role="img" aria-label="Registered accounts grouped by role">
+        <div class="role-chart" role="img" :aria-label="roleChartLabel">
           <div v-for="item in roleData" :key="item.label" class="chart-row">
             <span>{{ item.label }}</span>
             <div class="chart-track" aria-hidden="true">
@@ -71,7 +81,7 @@ const signupData = computed(() => {
 
       <figure v-else>
         <figcaption>Registrations by month</figcaption>
-        <div v-if="signupData.length" class="month-chart" aria-label="Monthly user registrations">
+        <div v-if="signupData.length" class="month-chart" role="img" :aria-label="signupChartLabel">
           <div v-for="item in signupData" :key="item.month" class="month-column">
             <strong>{{ item.value }}</strong>
             <span class="month-bar" :style="{ height: `${Math.max(item.percent, 8)}%` }"></span>

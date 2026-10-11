@@ -16,6 +16,15 @@ const { isAdmin } = useAuth()
 
 const validPages = ['home', 'activities', 'ratings', 'get-involved', 'account', 'admin']
 
+const pageTitles = {
+  home: 'Home',
+  activities: 'Explore activities',
+  ratings: 'Community ratings',
+  'get-involved': 'Get involved',
+  account: 'Account',
+  admin: 'Administration dashboard',
+}
+
 const currentPage = ref('home')
 const selectedActivityId = ref('')
 
@@ -53,6 +62,7 @@ function displayPage(requestedPage, addHistory = true) {
   const nextPage = allowedPage(safePage)
 
   currentPage.value = nextPage
+  document.title = `${pageTitles[nextPage]} | PlayPath Melbourne`
 
   const nextAddress = `#${nextPage}`
 

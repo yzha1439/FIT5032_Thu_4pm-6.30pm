@@ -196,6 +196,9 @@ The application is designed toward WCAG 2.1 AA requirements. Accessibility suppo
 - Error messages connected to their fields with `aria-describedby` and `aria-invalid`
 - Text alternatives or hidden decorative content for non-text interface elements
 - Reduced-motion support through `prefers-reduced-motion`
+- Route-specific document titles and focused main content after single-page navigation
+- Text-equivalent summaries for interactive Firestore charts
+- A hash-router-safe skip link that moves keyboard focus directly to the active main landmark
 
 ## A3 BR F.1: Innovation
 

@@ -19,10 +19,16 @@ function navigate(page) {
   menuOpen.value = false
   emit('navigate', page)
 }
+
+function skipToContent() {
+  document.querySelector('#main-content')?.focus()
+}
 </script>
 
 <template>
-  <a class="skip-link" href="#main-content"> Skip to main content </a>
+  <a class="skip-link" href="#main-content" @click.prevent="skipToContent">
+    Skip to main content
+  </a>
 
   <header class="site-header">
     <div class="site-container site-header__layout">
