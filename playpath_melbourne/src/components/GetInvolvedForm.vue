@@ -57,10 +57,13 @@ watch(
 watch(
   () => props.selectedActivityId,
   (activityId) => {
-    if (activityId) {
+    const activityExists = props.activities.some((activity) => String(activity.id) === activityId)
+
+    if (activityExists) {
       form.activityId = activityId
     }
   },
+  { immediate: true },
 )
 
 function clearErrors() {
