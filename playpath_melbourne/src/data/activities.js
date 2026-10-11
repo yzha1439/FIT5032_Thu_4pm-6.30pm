@@ -12,6 +12,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: true,
+    location: { lat: -37.8183, lng: 145.0034, venue: 'Citizens Park' },
     description: 'A relaxed riverside ride with volunteer ride leaders and regular rest stops.',
   },
   {
@@ -27,6 +28,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: true,
+    location: { lat: -37.7817, lng: 144.9518, venue: 'Royal Park' },
     description: 'Discover local biodiversity on a flat, mobility-friendly guided walk.',
   },
   {
@@ -42,6 +44,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Limited',
     featured: true,
+    location: { lat: -37.7992, lng: 144.9008, venue: 'Footscray Park' },
     description: 'Build confidence with braking, signalling and safe shared-path riding.',
   },
   {
@@ -57,6 +60,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.7665, lng: 144.9591, venue: 'Brunswick Neighbourhood House' },
     description: 'A pram-friendly community walk connecting families with local green spaces.',
   },
   {
@@ -72,6 +76,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.7983, lng: 144.9666, venue: 'Princes Park' },
     description: 'An inclusive skills session with shared equipment and volunteer coaches.',
   },
   {
@@ -87,6 +92,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.8676, lng: 144.9747, venue: 'Catani Gardens' },
     description: 'Combine a social jog or walk with a foreshore litter collection.',
   },
   {
@@ -102,6 +108,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.8165, lng: 144.9475, venue: 'Ron Barassi Snr Park' },
     description: 'A friendly modified soccer session designed for mixed abilities.',
   },
   {
@@ -117,6 +124,7 @@ export const activities = [
     level: 'Intermediate',
     status: 'Open',
     featured: false,
+    location: { lat: -37.8025, lng: 144.9072, venue: 'Maribyrnong River Trail' },
     description: 'A longer social ride following shared paths beside the Maribyrnong River.',
   },
   {
@@ -132,6 +140,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.7702, lng: 144.9996, venue: 'All Nations Park' },
     description: 'Casual cricket plus practical ideas for lower-waste community sport.',
   },
   {
@@ -147,6 +156,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.8136, lng: 144.9631, venue: 'State Library Victoria' },
     description: 'Plan safe, practical alternatives to short everyday car journeys.',
   },
   {
@@ -162,6 +172,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Open',
     featured: false,
+    location: { lat: -37.7392, lng: 145.0081, venue: 'Darebin Creek Trail' },
     description: 'A conversational morning walk along a mostly level shared trail.',
   },
   {
@@ -177,6 +188,7 @@ export const activities = [
     level: 'Beginner',
     status: 'Limited',
     featured: false,
+    location: { lat: -37.7692, lng: 144.9617, venue: 'Brunswick Bike Shed' },
     description: 'Learn simple checks and repairs that keep everyday bicycles moving safely.',
   },
 ]

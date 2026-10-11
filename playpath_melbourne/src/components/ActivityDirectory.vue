@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
+import ActivityMap from './ActivityMap.vue'
 import ActivityRating from './ActivityRating.vue'
 import ExportActions from './ExportActions.vue'
 
@@ -168,6 +169,8 @@ function clearFilters() {
         :types="types"
         @clear="clearFilters"
       />
+
+      <ActivityMap :activities="sortedActivities" @register="$emit('select', $event)" />
 
       <div class="results-heading">
         <p class="result-count" aria-live="polite">
