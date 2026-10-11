@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { getPublicUsers, useAuth } from '../services/auth.js'
 import { activities } from '../data/activities.js'
 import ExportActions from './ExportActions.vue'
+import AdminInsights from './AdminInsights.vue'
 
 const { currentUser, isAdmin } = useAuth()
 
@@ -160,6 +161,8 @@ function clearUserFilters() {
             <span>Published activities</span>
           </article>
         </div>
+
+        <AdminInsights :users="users" />
 
         <div class="user-list">
           <h3>User accounts</h3>

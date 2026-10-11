@@ -3,6 +3,8 @@ import { computed, reactive, ref, watch } from 'vue'
 
 import { useAuth } from '../services/auth.js'
 import { emailCommunityPass } from '../services/email.js'
+import { safeJsonRead } from '../services/security.js'
+import ActivitySchedule from './ActivitySchedule.vue'
 
 const props = defineProps({
   activities: {
@@ -99,6 +101,24 @@ function validateForm() {
 
   if (!form.activityId) {
     errors.activityId = 'Select an activity you are interested in.'
+  } else {
+    const selectedActivity = props.activities.find(
+      (activity) => String(activity.id) === form.activityId,
+    )
+    const registrations = safeJsonRead('playpathExpressionsOfInterest', [])
+    const conflict = registrations.find((registration) => {
+      const bookedActivity = props.activities.find(
+        (activity) => String(activity.id) === String(registration.activityId),
+      )
+      return bookedActivity?.date === selectedActivity?.date
+    })
+
+    if (conflict) {
+      const bookedActivity = props.activities.find(
+        (activity) => String(activity.id) === String(conflict.activityId),
+      )
+      errors.activityId = `Schedule conflict: ${bookedActivity.name} is already saved for ${bookedActivity.dateLabel}. Remove it from your schedule or choose another date.`
+    }
   }
 
   if (form.message.length > 300) {
@@ -124,6 +144,7 @@ function saveRegistration() {
   })
 
   localStorage.setItem('playpathExpressionsOfInterest', JSON.stringify(existingRegistrations))
+  window.dispatchEvent(new Event('playpath-registration-change'))
 }
 
 function resetForm() {
@@ -159,6 +180,15 @@ async function submitForm() {
   isSubmitting.value = true
 
   try {
+    if (!navigator.onLine) {
+      saveRegistration()
+      successMessage.value =
+        'Your pass was saved securely on this device while offline. Email delivery can be requested when you reconnect.'
+      resetForm()
+      clearErrors()
+      return
+    }
+
     if (form.emailPass && canEmailPass.value) {
       await emailCommunityPass({ ...registration, activity })
       saveRegistration()
@@ -404,6 +434,8 @@ async function submitForm() {
           </div>
         </form>
       </div>
+
+      <ActivitySchedule :activities="activities" />
     </div>
   </section>
 </template>

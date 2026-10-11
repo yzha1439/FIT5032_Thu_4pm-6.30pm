@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase-admin/app'
 import { FieldValue, getFirestore } from 'firebase-admin/firestore'
-import { HttpsError, onCall } from 'firebase-functions/v2/https'
+import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https'
 import { defineSecret } from 'firebase-functions/params'
 import { Resend } from 'resend'
 
@@ -10,6 +10,152 @@ const db = getFirestore()
 const resendApiKey = defineSecret('RESEND_API_KEY')
 
 const permittedActivities = new Set(Array.from({ length: 12 }, (_, index) => index + 1))
+
+const publicActivities = [
+  {
+    id: 1,
+    name: 'Yarra Social Ride',
+    date: '2026-11-07',
+    suburb: 'Richmond',
+    type: 'Cycling',
+    accessibility: 'Partial',
+  },
+  {
+    id: 2,
+    name: 'Royal Park Climate Walk',
+    date: '2026-11-10',
+    suburb: 'Parkville',
+    type: 'Walking',
+    accessibility: 'Yes',
+  },
+  {
+    id: 3,
+    name: 'Bike Skills for Beginners',
+    date: '2026-11-14',
+    suburb: 'Footscray',
+    type: 'Training',
+    accessibility: 'Partial',
+  },
+  {
+    id: 4,
+    name: 'Family Walking Group',
+    date: '2026-11-18',
+    suburb: 'Brunswick',
+    type: 'Walking',
+    accessibility: 'Yes',
+  },
+  {
+    id: 5,
+    name: 'Community Cricket Clinic',
+    date: '2026-11-21',
+    suburb: 'Carlton',
+    type: 'Community Sport',
+    accessibility: 'Yes',
+  },
+  {
+    id: 6,
+    name: 'Parkrun Clean-up',
+    date: '2026-11-25',
+    suburb: 'St Kilda',
+    type: 'Running',
+    accessibility: 'Partial',
+  },
+  {
+    id: 7,
+    name: 'Inclusive Social Soccer',
+    date: '2026-11-28',
+    suburb: 'Docklands',
+    type: 'Community Sport',
+    accessibility: 'Yes',
+  },
+  {
+    id: 8,
+    name: 'Maribyrnong River Ride',
+    date: '2026-12-02',
+    suburb: 'Footscray',
+    type: 'Cycling',
+    accessibility: 'Partial',
+  },
+  {
+    id: 9,
+    name: 'Green Cricket Afternoon',
+    date: '2026-12-05',
+    suburb: 'Northcote',
+    type: 'Community Sport',
+    accessibility: 'Yes',
+  },
+  {
+    id: 10,
+    name: 'Active Travel Workshop',
+    date: '2026-12-09',
+    suburb: 'Melbourne',
+    type: 'Education',
+    accessibility: 'Yes',
+  },
+  {
+    id: 11,
+    name: 'Darebin Creek Walking Group',
+    date: '2026-12-12',
+    suburb: 'Preston',
+    type: 'Walking',
+    accessibility: 'Yes',
+  },
+  {
+    id: 12,
+    name: 'Cycle Maintenance Basics',
+    date: '2026-12-16',
+    suburb: 'Brunswick',
+    type: 'Training',
+    accessibility: 'Yes',
+  },
+]
+
+function rejectUnsupportedMethod(request, response) {
+  if (request.method === 'GET') return false
+  response.set('Allow', 'GET').status(405).json({ error: 'Only GET requests are supported.' })
+  return true
+}
+
+export const getActivities = onRequest(
+  { region: 'australia-southeast2', cors: true },
+  (request, response) => {
+    if (rejectUnsupportedMethod(request, response)) return
+
+    const type = cleanText(request.query.type, 60).toLowerCase()
+    const suburb = cleanText(request.query.suburb, 60).toLowerCase()
+    const results = publicActivities.filter(
+      (activity) =>
+        (!type || activity.type.toLowerCase() === type) &&
+        (!suburb || activity.suburb.toLowerCase() === suburb),
+    )
+
+    response.set('Cache-Control', 'public, max-age=300, s-maxage=600').status(200).json({
+      count: results.length,
+      data: results,
+    })
+  },
+)
+
+export const getActivityById = onRequest(
+  { region: 'australia-southeast2', cors: true },
+  (request, response) => {
+    if (rejectUnsupportedMethod(request, response)) return
+
+    const id = Number(request.query.id)
+    const activity = Number.isInteger(id)
+      ? publicActivities.find((item) => item.id === id)
+      : undefined
+
+    if (!activity) {
+      response.status(404).json({ error: 'Activity not found.' })
+      return
+    }
+
+    response.set('Cache-Control', 'public, max-age=300, s-maxage=600').status(200).json({
+      data: activity,
+    })
+  },
+)
 
 function cleanText(value, maximum) {
   return String(value || '')

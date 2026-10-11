@@ -62,10 +62,8 @@ function authError(error) {
       'This email already has a password account. Sign in with your password or choose another Google account.',
     'auth/credential-already-in-use':
       'This Google account is already linked to another PlayPath account.',
-    'auth/operation-not-allowed':
-      'Google sign-in is not enabled for this Firebase project.',
-    'auth/unauthorized-domain':
-      'This website domain is not authorised for Firebase sign-in.',
+    'auth/operation-not-allowed': 'Google sign-in is not enabled for this Firebase project.',
+    'auth/unauthorized-domain': 'This website domain is not authorised for Firebase sign-in.',
     'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
     'auth/popup-blocked': 'The browser blocked the Google sign-in window.',
     'auth/cancelled-popup-request': 'A newer Google sign-in request replaced the previous one.',
@@ -229,5 +227,6 @@ export async function getPublicUsers() {
     name: cleanText(item.data().name || 'Member', 60),
     email: normaliseEmail(item.data().email || ''),
     role: item.data().role === 'admin' ? 'admin' : 'member',
+    createdAt: item.data().createdAt?.toDate?.().toISOString() || null,
   }))
 }

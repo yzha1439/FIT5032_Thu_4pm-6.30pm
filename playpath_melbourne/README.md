@@ -197,6 +197,23 @@ The application is designed toward WCAG 2.1 AA requirements. Accessibility suppo
 - Text alternatives or hidden decorative content for non-text interface elements
 - Reduced-motion support through `prefers-reduced-motion`
 
+## A3 BR F.1: Innovation
+
+The application includes four extended UX innovations:
+
+1. **Appointment booking using a calendar:** saved Community Passes appear in a personal schedule,
+   and the form prevents conflicting bookings on the same date.
+2. **Interactive Firestore charts:** administrators can switch between role distribution and monthly
+   registration charts generated from Firestore user records.
+3. **Offline application features:** a service worker caches the application shell, connection changes
+   are announced, and Community Passes can be saved locally while offline.
+4. **Admin dashboard:** a protected dashboard summarises registered users, roles and published
+   activities and provides interactive account data tools.
+
+The backend additionally exposes two read-only REST endpoints: `getActivities` supports optional
+`type` and `suburb` filters, while `getActivityById` accepts an `id` query parameter. Both endpoints
+return JSON, enable CORS and reject unsupported HTTP methods.
+
 ## Project Setup
 
 Install dependencies:
