@@ -120,7 +120,7 @@ The backend applies the following safeguards:
 
 Create a Resend API key, then run:
 
-```bash
+```
 firebase login
 firebase functions:secrets:set RESEND_API_KEY
 firebase deploy --only functions
@@ -140,6 +140,22 @@ The application contains two interactive data tables:
   columns and pagination limited to 10 rows per page.
 
 Both tables use semantic captions, column headers, accessible sort state and live result counts.
+
+## A3 BR D.4: Deployment to the Cloud
+
+The production application is deployed with Firebase Hosting at:
+
+- <https://playpath-melbourne.web.app>
+
+The hosting configuration serves the Vite production build over HTTPS, rewrites client-side routes
+to `index.html`, applies long-lived caching to hashed assets and sends security headers for content
+type protection, referrer handling, frame blocking and browser permissions. A deployment can be
+reproduced with:
+
+```
+npm run build
+npx firebase-tools deploy --only hosting --project playpath-melbourne
+```
 
 ## A3 BR E.1: Cloud Functions
 
