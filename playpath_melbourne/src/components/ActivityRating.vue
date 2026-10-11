@@ -189,11 +189,6 @@ function submitRating() {
   cursor: pointer;
 }
 
-.activity-rating__stars button:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-}
-
 .activity-rating textarea {
   width: 100%;
   padding: 0.55rem;

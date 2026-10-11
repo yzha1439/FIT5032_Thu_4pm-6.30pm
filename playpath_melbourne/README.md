@@ -130,6 +130,57 @@ The Firebase project must use the Blaze plan to deploy Cloud Functions. During t
 `onboarding@resend.dev` sender can deliver to the email address associated with the Resend account.
 Verify a custom domain before sending to other recipients in production.
 
+## A3 BR D.3: Interactive Table Data
+
+The application contains two interactive data tables:
+
+- The Explore activity table supports sorting by activity, date, suburb, type, cost and access;
+  searching and filtering by individual fields; and pagination limited to 10 rows per page.
+- The administrator user table supports independent name, email and role searches, sortable
+  columns and pagination limited to 10 rows per page.
+
+Both tables use semantic captions, column headers, accessible sort state and live result counts.
+
+## A3 BR E.1: Cloud Functions
+
+The Community Pass email workflow runs in a second-generation Firebase callable Cloud Function.
+Authentication, verified-recipient enforcement, server-side validation, rate limiting, calendar
+generation and the Resend API request are performed on the server. The deployed function is located
+in `australia-southeast2` and reads its API credential from Firebase Secret Manager.
+
+## A3 BR E.2: Geo Location
+
+The Explore page includes an interactive Leaflet and OpenStreetMap activity map with multiple
+non-trivial location features:
+
+- Filter-aware activity markers and activity search
+- Browser geolocation with a privacy-friendly manual map selection fallback
+- Nearest-activity discovery using the Haversine distance formula
+- Direct-distance, walking-time and cycling-time estimates
+- A route line and a Google Maps directions link
+
+The map handles denied or unavailable location permission without preventing users from selecting a
+starting point manually.
+
+## A3 BR E.4: Export
+
+Filtered activity data and administrator user data can be exported as CSV or PDF. Exported files use
+the current sorted and filtered result set, include descriptive column headings and are generated in
+the browser without exposing authentication credentials.
+
+## A3 BR E.3: Accessibility
+
+The application is designed toward WCAG 2.1 AA requirements. Accessibility support includes:
+
+- A skip link and programmatic focus management after client-side navigation
+- Semantic landmarks, heading hierarchy, form labels, fieldsets and table captions
+- Keyboard-operable navigation, filters, forms, sortable columns, pagination and rating controls
+- High-contrast two-layer focus indicators that remain visible on light and dark backgrounds
+- `aria-current`, `aria-expanded`, `aria-pressed`, `aria-sort`, live status and alert announcements
+- Error messages connected to their fields with `aria-describedby` and `aria-invalid`
+- Text alternatives or hidden decorative content for non-text interface elements
+- Reduced-motion support through `prefers-reduced-motion`
+
 ## Project Setup
 
 Install dependencies:

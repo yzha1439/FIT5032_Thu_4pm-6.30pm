@@ -109,8 +109,9 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 4px solid var(--lime);
-  outline-offset: 4px;
+  outline: 3px solid var(--white);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

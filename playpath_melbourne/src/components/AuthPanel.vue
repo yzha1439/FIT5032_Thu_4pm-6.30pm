@@ -390,11 +390,6 @@ async function checkVerificationStatus() {
   border-radius: 4px 14px 4px 14px;
 }
 
-.auth-field input:focus-visible {
-  outline: 4px solid var(--lime);
-  outline-offset: 4px;
-}
-
 .auth-field small {
   display: block;
   margin-top: 0.4rem;
