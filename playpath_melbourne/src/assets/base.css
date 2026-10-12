@@ -55,6 +55,34 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+html.user-large-text {
+  font-size: 118.75%;
+}
+
+html.user-high-contrast {
+  --ink: #0b0716;
+  --ink-soft: #373047;
+  --primary: #3f2dbd;
+  --primary-dark: #25147f;
+  --paper: #ffffff;
+  --lavender: #e5ddff;
+  --sky: #e8f7ff;
+  --border: #777080;
+}
+
+html.user-high-contrast body {
+  text-decoration-thickness: 0.12em;
+}
+
+html.user-reduced-motion *,
+html.user-reduced-motion *::before,
+html.user-reduced-motion *::after {
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+}
+
 button,
 input,
 select,

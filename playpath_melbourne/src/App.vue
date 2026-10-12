@@ -8,6 +8,7 @@ import RatingPanel from './components/RatingPanel.vue'
 import AdminDashboard from './components/AdminDashboard.vue'
 import GetInvolvedForm from './components/GetInvolvedForm.vue'
 import ConnectionStatus from './components/ConnectionStatus.vue'
+import AccessibilityPreferences from './components/AccessibilityPreferences.vue'
 
 import { activities } from './data/activities.js'
 import { useAuth } from './services/auth.js'
@@ -117,6 +118,7 @@ onBeforeUnmount(() => {
 <template>
   <AppHeader :current-page="currentPage" @navigate="displayPage" />
   <ConnectionStatus />
+  <AccessibilityPreferences />
 
   <!-- Home page -->
   <main v-if="currentPage === 'home'" id="main-content" tabindex="-1">

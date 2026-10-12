@@ -27,21 +27,24 @@ The public routes passed the following structural checks:
 - Invalid fields expose `aria-invalid` and associated error text through `aria-describedby`.
 - Dynamic connection, submission, filtering and location messages use live status semantics.
 - Interactive chart values have equivalent screen-reader summaries.
+- User-controlled larger text, high contrast and reduced-motion preferences persist on the device.
+- Accessibility preference buttons expose their active state using `aria-pressed` and announce
+  changes through a polite live region.
 
 ## Colour contrast
 
 Representative interface colour pairs were calculated using the WCAG relative luminance formula.
 All tested normal-text combinations exceed the AA requirement of 4.5:1:
 
-| Foreground and background | Ratio |
-| --- | ---: |
-| White on primary purple | 6.04:1 |
-| Ink on paper | 15.19:1 |
-| Muted ink on paper | 5.75:1 |
-| Primary purple on paper | 5.94:1 |
-| White on error red | 5.84:1 |
-| Success green on success background | 5.20:1 |
-| Error red on error background | 5.32:1 |
+| Foreground and background           |   Ratio |
+| ----------------------------------- | ------: |
+| White on primary purple             |  6.04:1 |
+| Ink on paper                        | 15.19:1 |
+| Muted ink on paper                  |  5.75:1 |
+| Primary purple on paper             |  5.94:1 |
+| White on error red                  |  5.84:1 |
+| Success green on success background |  5.20:1 |
+| Error red on error background       |  5.32:1 |
 
 ## Keyboard and motion support
 
@@ -49,6 +52,8 @@ All tested normal-text combinations exceed the AA requirement of 4.5:1:
 - Sort, pagination, rating, export, map, authentication and form controls are keyboard operable.
 - A visible two-layer focus indicator is applied to links, buttons and form controls.
 - `prefers-reduced-motion: reduce` disables non-essential animation and smooth scrolling.
+- A persistent preference panel lets users reduce motion even when their operating-system preference
+  is unavailable or cannot be changed.
 
 ## Screen-reader support
 
@@ -59,5 +64,7 @@ All tested normal-text combinations exceed the AA requirement of 4.5:1:
 
 ## Future verification
 
-Before the final interview, repeat a short manual test with VoiceOver and at 200% browser zoom. Any
-future content or colour changes should be retested because accessibility compliance can regress.
+Before the final interview, repeat a short manual test with VoiceOver and at 200% browser zoom. Test
+the larger-text mode at both mobile and desktop widths and retain one screenshot of an external
+checker result as submission evidence. Any future content or colour changes should be retested
+because accessibility compliance can regress.
