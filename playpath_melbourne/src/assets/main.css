@@ -199,6 +199,17 @@
   background: var(--lavender);
 }
 
+.primary-nav__accessibility {
+  padding: 0.75rem 0.9rem;
+  color: var(--ink);
+  background: var(--lime);
+  border: 2px solid var(--ink);
+  border-radius: 4px 14px 4px 14px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .primary-nav__action {
   color: white;
   background: var(--primary);

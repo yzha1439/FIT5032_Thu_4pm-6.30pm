@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 import { safeJsonRead, safeJsonWrite } from '../services/security.js'
 
@@ -41,6 +41,10 @@ watch(panelOpen, (open) => {
   if (open) announcement.value = 'Accessibility preferences opened.'
 })
 
+function openPanel() {
+  panelOpen.value = true
+}
+
 onMounted(() => {
   const stored = safeJsonRead(STORAGE_KEY, {})
   Object.assign(preferences, {
@@ -49,6 +53,11 @@ onMounted(() => {
     reduceMotion: Boolean(stored.reduceMotion),
   })
   applyPreferences()
+  window.addEventListener('playpath-open-accessibility', openPanel)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('playpath-open-accessibility', openPanel)
 })
 </script>
 

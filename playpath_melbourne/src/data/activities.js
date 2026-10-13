@@ -179,8 +179,10 @@ export const activities = [
     id: 12,
     name: 'Cycle Maintenance Basics',
     club: 'Brunswick Bike Shed',
-    date: '2026-12-16',
-    dateLabel: '16 Dec 2026',
+    // Deliberately shares a date with the Darebin Creek Walking Group so that
+    // the calendar conflict rule can be demonstrated with real activity data.
+    date: '2026-12-12',
+    dateLabel: '12 Dec 2026',
     suburb: 'Brunswick',
     type: 'Training',
     cost: 10,

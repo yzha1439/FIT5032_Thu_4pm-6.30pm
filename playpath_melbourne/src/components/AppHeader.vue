@@ -23,6 +23,10 @@ function navigate(page) {
 function skipToContent() {
   document.querySelector('#main-content')?.focus()
 }
+
+function openAccessibilityPreferences() {
+  window.dispatchEvent(new Event('playpath-open-accessibility'))
+}
 </script>
 
 <template>
@@ -123,6 +127,14 @@ function skipToContent() {
         >
           {{ currentUser ? currentUser.name : 'Sign in' }}
         </a>
+
+        <button
+          class="primary-nav__accessibility"
+          type="button"
+          @click="openAccessibilityPreferences"
+        >
+          Accessibility
+        </button>
       </nav>
     </div>
   </header>
