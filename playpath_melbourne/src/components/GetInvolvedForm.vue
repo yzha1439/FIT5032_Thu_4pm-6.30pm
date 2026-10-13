@@ -46,6 +46,17 @@ const canEmailPass = computed(
   () => isAuthenticated.value && Boolean(currentUser.value?.emailVerified),
 )
 
+const selectedActivity = computed(() =>
+  props.activities.find((activity) => String(activity.id) === String(form.activityId)),
+)
+
+const selectedActivityFeeNote = computed(() => {
+  if (!selectedActivity.value) return ''
+
+  const fee = selectedActivity.value.cost === 0 ? 'Free' : `$${selectedActivity.value.cost}`
+  return `${fee} activity fee shown for information only. No online payment is collected.`
+})
+
 watch(
   currentUser,
   (user) => {
@@ -344,6 +355,10 @@ async function submitForm() {
               <p v-if="errors.activityId" id="activity-error" class="error-message">
                 <span aria-hidden="true">!</span>
                 {{ errors.activityId }}
+              </p>
+
+              <p v-if="selectedActivityFeeNote" class="fee-note" role="status">
+                {{ selectedActivityFeeNote }}
               </p>
             </div>
           </div>
