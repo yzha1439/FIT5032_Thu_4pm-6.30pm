@@ -42,6 +42,31 @@ const submitError = ref('')
 const isSubmitting = ref(false)
 const { currentUser, isAuthenticated } = useAuth()
 
+const registrationStorageKey = computed(() =>
+  currentUser.value?.id ? `playpathExpressionsOfInterest:${currentUser.value.id}` : '',
+)
+
+function registrationsForCurrentUser() {
+  if (!registrationStorageKey.value || !currentUser.value) return []
+
+  const existing = safeJsonRead(registrationStorageKey.value, null)
+  if (Array.isArray(existing)) return existing
+
+  const legacy = safeJsonRead('playpathExpressionsOfInterest', [])
+  const matching = Array.isArray(legacy)
+    ? legacy.filter(
+        (registration) =>
+          registration.email?.trim().toLowerCase() === currentUser.value.email.toLowerCase(),
+      )
+    : []
+
+  if (matching.length) {
+    localStorage.setItem(registrationStorageKey.value, JSON.stringify(matching))
+  }
+
+  return matching
+}
+
 const canEmailPass = computed(
   () => isAuthenticated.value && Boolean(currentUser.value?.emailVerified),
 )
@@ -116,7 +141,7 @@ function validateForm() {
     const selectedActivity = props.activities.find(
       (activity) => String(activity.id) === form.activityId,
     )
-    const registrations = safeJsonRead('playpathExpressionsOfInterest', [])
+    const registrations = registrationsForCurrentUser()
     const conflict = registrations.find((registration) => {
       const bookedActivity = props.activities.find(
         (activity) => String(activity.id) === String(registration.activityId),
@@ -144,8 +169,10 @@ function validateForm() {
 }
 
 function saveRegistration() {
+  if (!registrationStorageKey.value) return false
+
   const existingRegistrations = JSON.parse(
-    localStorage.getItem('playpathExpressionsOfInterest') || '[]',
+    localStorage.getItem(registrationStorageKey.value) || '[]',
   )
 
   existingRegistrations.push({
@@ -154,8 +181,9 @@ function saveRegistration() {
     submittedAt: new Date().toISOString(),
   })
 
-  localStorage.setItem('playpathExpressionsOfInterest', JSON.stringify(existingRegistrations))
+  localStorage.setItem(registrationStorageKey.value, JSON.stringify(existingRegistrations))
   window.dispatchEvent(new Event('playpath-registration-change'))
+  return true
 }
 
 function resetForm() {
@@ -192,9 +220,10 @@ async function submitForm() {
 
   try {
     if (!navigator.onLine) {
-      saveRegistration()
-      successMessage.value =
-        'Your pass was saved securely on this device while offline. Email delivery can be requested when you reconnect.'
+      const saved = saveRegistration()
+      successMessage.value = saved
+        ? 'Your pass was saved securely on this device while offline. Email delivery can be requested when you reconnect.'
+        : 'Sign in to save this pass to your personal schedule.'
       resetForm()
       clearErrors()
       return
@@ -202,12 +231,15 @@ async function submitForm() {
 
     if (form.emailPass && canEmailPass.value) {
       await emailCommunityPass({ ...registration, activity })
-      saveRegistration()
-      successMessage.value =
-        'Your pass was saved and emailed with a calendar attachment to your verified address.'
+      const saved = saveRegistration()
+      successMessage.value = saved
+        ? 'Your pass was saved and emailed with a calendar attachment to your verified address.'
+        : 'The pass was emailed. Sign in to save it to your personal schedule.'
     } else {
-      saveRegistration()
-      successMessage.value = 'Your community pass has been saved successfully.'
+      const saved = saveRegistration()
+      successMessage.value = saved
+        ? 'Your community pass has been saved successfully.'
+        : 'Sign in to save this pass to your personal schedule.'
     }
 
     resetForm()

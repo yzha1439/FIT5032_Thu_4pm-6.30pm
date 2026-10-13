@@ -1,13 +1,36 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { safeJsonRead, safeJsonWrite } from '../services/security.js'
+import { useAuth } from '../services/auth.js'
 
 const props = defineProps({ activities: { type: Array, required: true } })
 const registrations = ref([])
 const calendarCursor = ref(new Date())
+const { currentUser } = useAuth()
+
+const registrationStorageKey = computed(() =>
+  currentUser.value?.id ? `playpathExpressionsOfInterest:${currentUser.value.id}` : '',
+)
 
 function loadSchedule() {
-  registrations.value = safeJsonRead('playpathExpressionsOfInterest', [])
+  if (!registrationStorageKey.value || !currentUser.value) {
+    registrations.value = []
+  } else {
+    const existing = safeJsonRead(registrationStorageKey.value, null)
+    if (Array.isArray(existing)) {
+      registrations.value = existing
+    } else {
+      const legacy = safeJsonRead('playpathExpressionsOfInterest', [])
+      const matching = Array.isArray(legacy)
+        ? legacy.filter(
+            (registration) =>
+              registration.email?.trim().toLowerCase() === currentUser.value.email.toLowerCase(),
+          )
+        : []
+      registrations.value = matching
+      if (matching.length) safeJsonWrite(registrationStorageKey.value, matching)
+    }
+  }
 
   const firstActivity = scheduledActivities.value[0]?.activity
   if (firstActivity && !calendarInitialised.value) {
@@ -69,7 +92,7 @@ function changeMonth(offset) {
 
 function removeBooking(registrationId) {
   const remaining = registrations.value.filter((item) => item.id !== registrationId)
-  if (safeJsonWrite('playpathExpressionsOfInterest', remaining)) {
+  if (registrationStorageKey.value && safeJsonWrite(registrationStorageKey.value, remaining)) {
     registrations.value = remaining
     window.dispatchEvent(new Event('playpath-registration-change'))
   }
@@ -80,6 +103,8 @@ onMounted(() => {
   window.addEventListener('playpath-registration-change', loadSchedule)
   window.addEventListener('storage', loadSchedule)
 })
+
+watch(currentUser, loadSchedule)
 
 onBeforeUnmount(() => {
   window.removeEventListener('playpath-registration-change', loadSchedule)
@@ -97,7 +122,11 @@ onBeforeUnmount(() => {
       </p>
     </div>
 
-    <ol v-if="scheduledActivities.length" class="schedule-list">
+    <p v-if="!currentUser" class="schedule-empty">
+      Sign in to view and manage your personal activity schedule.
+    </p>
+
+    <ol v-else-if="scheduledActivities.length" class="schedule-list">
       <li v-for="entry in scheduledActivities" :key="entry.registrationId">
         <time :datetime="entry.activity.date">
           <strong>{{ new Date(`${entry.activity.date}T00:00:00`).getDate() }}</strong>
@@ -118,7 +147,7 @@ onBeforeUnmount(() => {
     </ol>
     <p v-else class="schedule-empty">Create a Community Pass to add your first activity.</p>
 
-    <div class="calendar-view" aria-labelledby="calendar-view-title">
+    <div v-if="currentUser" class="calendar-view" aria-labelledby="calendar-view-title">
       <div class="calendar-view__header">
         <button type="button" aria-label="Show previous month" @click="changeMonth(-1)">←</button>
         <h4 id="calendar-view-title">{{ calendarTitle }}</h4>
