@@ -7,6 +7,7 @@ const STORAGE_KEY = 'playpathAccessibilityPreferences'
 const panelOpen = ref(false)
 const announcement = ref('')
 const speechSupported = ref(false)
+const voiceSupported = ref(false)
 const listening = ref(false)
 let recognition = null
 const preferences = reactive({
@@ -68,7 +69,12 @@ function toggleVoiceSearch() {
 
   listening.value = true
   announcement.value = 'Listening for an activity name, suburb, or activity type.'
-  recognition.start()
+  try {
+    recognition.start()
+  } catch {
+    listening.value = false
+    announcement.value = 'Voice input could not start. Check microphone permission and try again.'
+  }
 }
 
 watch(panelOpen, (open) => {
@@ -90,6 +96,7 @@ onMounted(() => {
   speechSupported.value = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
 
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  voiceSupported.value = Boolean(Recognition)
   if (Recognition) {
     recognition = new Recognition()
     recognition.lang = 'en-AU'
@@ -102,8 +109,13 @@ onMounted(() => {
         announcement.value = `Voice search applied: ${transcript}.`
       }
     }
-    recognition.onerror = () => {
-      announcement.value = 'Voice input could not be completed. Please try again.'
+    recognition.onerror = (event) => {
+      listening.value = false
+      announcement.value = event.error === 'not-allowed'
+        ? 'Microphone permission was denied. Allow microphone access for this site.'
+        : event.error === 'no-speech'
+          ? 'No speech was detected. Please try again.'
+          : 'Voice input could not be completed. Please try again.'
     }
     recognition.onend = () => {
       listening.value = false
@@ -159,8 +171,8 @@ onBeforeUnmount(() => {
         <button type="button" :disabled="!speechSupported" @click="speakPageGuide">
           {{ speechSupported ? 'Play audio guide' : 'Audio guide unavailable' }}
         </button>
-        <button type="button" :aria-pressed="listening" @click="toggleVoiceSearch">
-          {{ listening ? 'Stop voice search' : 'Voice search' }}
+        <button type="button" :disabled="!voiceSupported" :aria-pressed="listening" @click="toggleVoiceSearch">
+          {{ voiceSupported ? (listening ? 'Stop voice search' : 'Voice search') : 'Voice search unavailable' }}
         </button>
         <button type="button" @click="resetPreferences">Reset</button>
       </div>
