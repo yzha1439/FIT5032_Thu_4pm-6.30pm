@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
 import ActivityMap from './ActivityMap.vue'
@@ -20,6 +20,7 @@ const suburb = ref('All')
 const type = ref('All')
 const accessibility = ref('All')
 const cost = ref('All')
+const columnFilters = ref({ name: '', date: '', suburb: '', type: '', cost: '', access: '' })
 const sortKey = ref('date')
 const sortDirection = ref('asc')
 const currentPage = ref(1)
@@ -61,7 +62,15 @@ const filteredActivities = computed(() => {
     const matchesCost =
       cost.value === 'All' || (cost.value === 'Free' ? activity.cost === 0 : activity.cost > 0)
 
-    return matchesSearch && matchesSuburb && matchesType && matchesAccessibility && matchesCost
+    const matchesColumn =
+      (!columnFilters.value.name || activity.name.toLowerCase().includes(columnFilters.value.name.toLowerCase())) &&
+      (!columnFilters.value.date || activity.dateLabel.toLowerCase().includes(columnFilters.value.date.toLowerCase())) &&
+      (!columnFilters.value.suburb || activity.suburb.toLowerCase().includes(columnFilters.value.suburb.toLowerCase())) &&
+      (!columnFilters.value.type || activity.type.toLowerCase().includes(columnFilters.value.type.toLowerCase())) &&
+      (!columnFilters.value.cost || (activity.cost === 0 ? 'free' : `$${activity.cost}`).toLowerCase().includes(columnFilters.value.cost.toLowerCase())) &&
+      (!columnFilters.value.access || activity.accessibility.toLowerCase().includes(columnFilters.value.access.toLowerCase()))
+
+    return matchesSearch && matchesSuburb && matchesType && matchesAccessibility && matchesCost && matchesColumn
   })
 })
 
@@ -106,9 +115,9 @@ const resultRange = computed(() => {
   return `${start}-${end} of ${sortedActivities.value.length}`
 })
 
-watch([search, suburb, type, accessibility, cost], () => {
+watch([search, suburb, type, accessibility, cost, columnFilters], () => {
   currentPage.value = 1
-})
+}, { deep: true })
 
 watch(pageCount, (pages) => {
   if (currentPage.value > pages) currentPage.value = pages
@@ -140,8 +149,16 @@ function clearFilters() {
   type.value = 'All'
   accessibility.value = 'All'
   cost.value = 'All'
+  columnFilters.value = { name: '', date: '', suburb: '', type: '', cost: '', access: '' }
   currentPage.value = 1
 }
+
+function applyVoiceSearch(event) {
+  search.value = String(event.detail || '').trim()
+}
+
+onMounted(() => window.addEventListener('playpath-voice-search', applyVoiceSearch))
+onBeforeUnmount(() => window.removeEventListener('playpath-voice-search', applyVoiceSearch))
 </script>
 
 <template>
@@ -231,6 +248,15 @@ function clearFilters() {
               </th>
               <th scope="col">Rating</th>
               <th scope="col">Action</th>
+            </tr>
+            <tr class="table-filter-row">
+              <th scope="col"><label class="sr-only" for="activity-column-name">Search activity</label><input id="activity-column-name" v-model="columnFilters.name" type="search" placeholder="Search activity" /></th>
+              <th scope="col"><label class="sr-only" for="activity-column-date">Search date</label><input id="activity-column-date" v-model="columnFilters.date" type="search" placeholder="Search date" /></th>
+              <th scope="col"><label class="sr-only" for="activity-column-suburb">Search suburb</label><input id="activity-column-suburb" v-model="columnFilters.suburb" type="search" placeholder="Search suburb" /></th>
+              <th scope="col"><label class="sr-only" for="activity-column-type">Search type</label><input id="activity-column-type" v-model="columnFilters.type" type="search" placeholder="Search type" /></th>
+              <th scope="col"><label class="sr-only" for="activity-column-cost">Search cost</label><input id="activity-column-cost" v-model="columnFilters.cost" type="search" placeholder="Search cost" /></th>
+              <th scope="col"><label class="sr-only" for="activity-column-access">Search access</label><input id="activity-column-access" v-model="columnFilters.access" type="search" placeholder="Search access" /></th>
+              <th scope="col" colspan="2"><span class="sr-only">Column filters</span></th>
             </tr>
           </thead>
 

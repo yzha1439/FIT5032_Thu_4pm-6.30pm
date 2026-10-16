@@ -6,6 +6,9 @@ import { safeJsonRead, safeJsonWrite } from '../services/security.js'
 const STORAGE_KEY = 'playpathAccessibilityPreferences'
 const panelOpen = ref(false)
 const announcement = ref('')
+const speechSupported = ref(false)
+const listening = ref(false)
+let recognition = null
 const preferences = reactive({
   largeText: false,
   highContrast: false,
@@ -37,6 +40,37 @@ function resetPreferences() {
   announcement.value = 'Accessibility preferences reset.'
 }
 
+function speakPageGuide() {
+  if (!speechSupported.value) {
+    announcement.value = 'Audio guide is not supported in this browser.'
+    return
+  }
+
+  window.speechSynthesis.cancel()
+  const guide =
+    'PlayPath Melbourne helps you discover inclusive community activities. Use Explore to search and filter activities, use the map to choose a venue, and use Get involved to register. You can also use the keyboard to move through controls.'
+  const utterance = new SpeechSynthesisUtterance(guide)
+  utterance.rate = 0.95
+  window.speechSynthesis.speak(utterance)
+  announcement.value = 'Audio guide started.'
+}
+
+function toggleVoiceSearch() {
+  if (!recognition) {
+    announcement.value = 'Voice input is not supported in this browser.'
+    return
+  }
+
+  if (listening.value) {
+    recognition.stop()
+    return
+  }
+
+  listening.value = true
+  announcement.value = 'Listening for an activity name, suburb, or activity type.'
+  recognition.start()
+}
+
 watch(panelOpen, (open) => {
   if (open) announcement.value = 'Accessibility preferences opened.'
 })
@@ -53,10 +87,34 @@ onMounted(() => {
     reduceMotion: Boolean(stored.reduceMotion),
   })
   applyPreferences()
+  speechSupported.value = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
+
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (Recognition) {
+    recognition = new Recognition()
+    recognition.lang = 'en-AU'
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+    recognition.onresult = (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript?.trim()
+      if (transcript) {
+        window.dispatchEvent(new CustomEvent('playpath-voice-search', { detail: transcript }))
+        announcement.value = `Voice search applied: ${transcript}.`
+      }
+    }
+    recognition.onerror = () => {
+      announcement.value = 'Voice input could not be completed. Please try again.'
+    }
+    recognition.onend = () => {
+      listening.value = false
+    }
+  }
   window.addEventListener('playpath-open-accessibility', openPanel)
 })
 
 onBeforeUnmount(() => {
+  recognition?.stop()
+  window.speechSynthesis?.cancel()
   window.removeEventListener('playpath-open-accessibility', openPanel)
 })
 </script>
@@ -97,6 +155,12 @@ onBeforeUnmount(() => {
           @click="updatePreference('reduceMotion', 'Reduced motion')"
         >
           Reduce motion
+        </button>
+        <button type="button" :disabled="!speechSupported" @click="speakPageGuide">
+          {{ speechSupported ? 'Play audio guide' : 'Audio guide unavailable' }}
+        </button>
+        <button type="button" :aria-pressed="listening" @click="toggleVoiceSearch">
+          {{ listening ? 'Stop voice search' : 'Voice search' }}
         </button>
         <button type="button" @click="resetPreferences">Reset</button>
       </div>
