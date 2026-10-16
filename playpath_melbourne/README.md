@@ -218,6 +218,18 @@ The backend additionally exposes two read-only REST endpoints: `getActivities` s
 `type` and `suburb` filters, while `getActivityById` accepts an `id` query parameter. Both endpoints
 return JSON, enable CORS and reject unsupported HTTP methods.
 
+After deployment, the endpoints can be opened directly in a browser or called by another client:
+
+```
+https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivities
+https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivities?type=Cycling
+https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivityById?id=1
+```
+
+The Accessibility panel includes a Web Speech audio guide and optional voice search. Voice features
+use the browser's Web Speech API and keep the existing keyboard, high-contrast, large-text and
+reduced-motion controls available as fallbacks.
+
 Implementation rationale, research sources and future upgrade recommendations are documented in
 [`docs/f1-innovation-report.md`](docs/f1-innovation-report.md).
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playpath-shell-v1'
+const CACHE_NAME = 'playpath-shell-v2'
 const APP_SHELL = ['/', '/index.html']
 
 self.addEventListener('install', (event) => {

@@ -31,7 +31,7 @@ onBeforeUnmount(() => {
     {{
       online
         ? 'Connection restored. Online features are available.'
-        : 'You are offline. Browsing and local pass saving remain available.'
+        : 'You are offline. Cached browsing and local pass saving remain available. Email delivery and live Firebase data will resume when you reconnect.'
     }}
   </p>
 </template>
