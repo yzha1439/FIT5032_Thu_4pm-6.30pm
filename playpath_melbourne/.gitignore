@@ -19,6 +19,8 @@ coverage
 functions/.env
 functions/.env.*
 functions/node_modules
+.firebase/
+.wrangler/
 
 # Editor directories and files
 .vscode/*

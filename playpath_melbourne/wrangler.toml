@@ -1,0 +1,6 @@
+name = "playpath-melbourne"
+compatibility_date = "2026-10-17"
+pages_build_output_dir = "dist"
+
+[vars]
+VITE_DEPLOYMENT_PLATFORM = "Cloudflare Pages"

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import ActivityFilters from './ActivityFilters.vue'
 import ActivityMap from './ActivityMap.vue'
@@ -153,12 +153,6 @@ function clearFilters() {
   currentPage.value = 1
 }
 
-function applyVoiceSearch(event) {
-  search.value = String(event.detail || '').trim()
-}
-
-onMounted(() => window.addEventListener('playpath-voice-search', applyVoiceSearch))
-onBeforeUnmount(() => window.removeEventListener('playpath-voice-search', applyVoiceSearch))
 </script>
 
 <template>

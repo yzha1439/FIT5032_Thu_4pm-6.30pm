@@ -111,7 +111,7 @@ function openAccessibilityPreferences() {
         </a>
 
         <a
-          v-if="isAdmin"
+          v-if="currentUser && isAdmin"
           href="#admin"
           :aria-current="currentPage === 'admin' ? 'page' : undefined"
           @click.prevent="navigate('admin')"

@@ -143,9 +143,10 @@ Both tables use semantic captions, column headers, accessible sort state and liv
 
 ## A3 BR D.4: Deployment to the Cloud
 
-The production application is deployed with Firebase Hosting at:
+The production application is intended to be deployed with Cloudflare Pages. The expected public
+address after creating the Pages project named `playpath-melbourne` is:
 
-- <https://playpath-melbourne.web.app>
+- <https://playpath-melbourne.pages.dev>
 
 The hosting configuration serves the Vite production build over HTTPS, rewrites client-side routes
 to `index.html`, applies long-lived caching to hashed assets and sends security headers for content
@@ -154,7 +155,7 @@ reproduced with:
 
 ```
 npm run build
-npx firebase-tools deploy --only hosting --project playpath-melbourne
+npx wrangler pages deploy dist --project-name playpath-melbourne
 ```
 
 ## A3 BR E.1: Cloud Functions
@@ -226,9 +227,9 @@ https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivities
 https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivityById?id=1
 ```
 
-The Accessibility panel includes a Web Speech audio guide and optional voice search. Voice features
-use the browser's Web Speech API and keep the existing keyboard, high-contrast, large-text and
-reduced-motion controls available as fallbacks.
+The Accessibility panel includes a page-aware Web Speech audio guide and keeps keyboard navigation,
+high contrast, large text and reduced-motion controls available as fallbacks. Voice search is not
+included, so the directory's normal text search remains predictable and available to all users.
 
 Implementation rationale, research sources and future upgrade recommendations are documented in
 [`docs/f1-innovation-report.md`](docs/f1-innovation-report.md).

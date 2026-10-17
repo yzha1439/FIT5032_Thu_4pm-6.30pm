@@ -63,6 +63,7 @@ function displayPage(requestedPage, addHistory = true) {
   const nextPage = allowedPage(safePage)
 
   currentPage.value = nextPage
+  window.dispatchEvent(new CustomEvent('playpath-page-changed', { detail: nextPage }))
   document.title = `${pageTitles[nextPage]} | PlayPath Melbourne`
 
   const nextAddress = `#${nextPage}`
