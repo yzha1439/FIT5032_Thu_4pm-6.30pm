@@ -215,16 +215,17 @@ The application includes four extended UX innovations:
 4. **Admin dashboard:** a protected dashboard summarises registered users, roles and published
    activities and provides interactive account data tools.
 
-The backend additionally exposes two read-only REST endpoints: `getActivities` supports optional
-`type` and `suburb` filters, while `getActivityById` accepts an `id` query parameter. Both endpoints
-return JSON, enable CORS and reject unsupported HTTP methods.
+The backend additionally exposes two read-only REST endpoints. Cloudflare Pages provides the public
+same-origin paths below and proxies them to Firebase Cloud Functions: `getActivities` supports
+optional `type` and `suburb` filters, while `getActivityById` accepts an `id` query parameter. Both
+endpoints return JSON, enable CORS and reject unsupported HTTP methods.
 
 After deployment, the endpoints can be opened directly in a browser or called by another client:
 
 ```
-https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivities
-https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivities?type=Cycling
-https://australia-southeast2-playpath-melbourne.cloudfunctions.net/getActivityById?id=1
+https://playpath-melbourne.pages.dev/api/getActivities
+https://playpath-melbourne.pages.dev/api/getActivities?type=Cycling
+https://playpath-melbourne.pages.dev/api/getActivityById?id=1
 ```
 
 The Accessibility panel includes a page-aware Web Speech audio guide and keeps keyboard navigation,

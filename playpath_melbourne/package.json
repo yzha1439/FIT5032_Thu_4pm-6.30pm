@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:cloudflare": "npm run build && PROJECT_ROOT=\"$(pwd)\" sh -c 'cd /private/tmp && npm_config_cache=/private/tmp/playpath-npm-cache npx wrangler pages deploy \"$PROJECT_ROOT/dist\" --project-name playpath-melbourne --commit-dirty=true'",
+    "deploy:cloudflare": "npm run build && PROJECT_ROOT=\"$(pwd)\" STAGING_DIR=\"$(mktemp -d /private/tmp/playpath-pages.XXXXXX)\" sh -c 'cp -R \"$PROJECT_ROOT/dist\" \"$STAGING_DIR/dist\" && mkdir -p \"$STAGING_DIR/functions/api\" && cp \"$PROJECT_ROOT/functions/api/\"*.js \"$STAGING_DIR/functions/api/\" && cd \"$STAGING_DIR\" && npm_config_cache=/private/tmp/playpath-npm-cache npx wrangler pages deploy dist --project-name playpath-melbourne --commit-dirty=true'",
     "format": "prettier --write src/"
   },
   "dependencies": {
