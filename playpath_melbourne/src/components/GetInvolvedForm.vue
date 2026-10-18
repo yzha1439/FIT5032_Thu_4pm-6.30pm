@@ -229,14 +229,21 @@ async function submitForm() {
       return
     }
 
+    const saved = saveRegistration()
+
     if (form.emailPass && canEmailPass.value) {
-      await emailCommunityPass({ ...registration, activity })
-      const saved = saveRegistration()
-      successMessage.value = saved
-        ? 'Your pass was saved and emailed with a calendar attachment to your verified address.'
-        : 'The pass was emailed. Sign in to save it to your personal schedule.'
+      try {
+        await emailCommunityPass({ ...registration, activity })
+        successMessage.value = saved
+          ? 'Your pass was saved and emailed with a calendar attachment to your verified address.'
+          : 'The pass was emailed. Sign in to save it to your personal schedule.'
+      } catch (error) {
+        successMessage.value = saved
+          ? 'Your pass was saved to your personal schedule, but email delivery failed. You can try emailing it again shortly.'
+          : ''
+        submitError.value = error.message
+      }
     } else {
-      const saved = saveRegistration()
       successMessage.value = saved
         ? 'Your community pass has been saved successfully.'
         : 'Sign in to save this pass to your personal schedule.'

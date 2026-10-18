@@ -8,6 +8,7 @@ initializeApp()
 
 const db = getFirestore()
 const resendApiKey = defineSecret('RESEND_API_KEY')
+const resendFromEmail = defineSecret('RESEND_FROM_EMAIL')
 
 const permittedActivities = new Set(Array.from({ length: 12 }, (_, index) => index + 1))
 
@@ -247,7 +248,7 @@ async function enforceRateLimit(uid) {
 export const sendCommunityPassEmail = onCall(
   {
     region: 'australia-southeast2',
-    secrets: [resendApiKey],
+    secrets: [resendApiKey, resendFromEmail],
     timeoutSeconds: 30,
     memory: '256MiB',
   },
@@ -305,7 +306,7 @@ export const sendCommunityPassEmail = onCall(
     try {
       const { error } = await resend.emails.send({
         to: accountEmail,
-        from: 'PlayPath Melbourne <onboarding@resend.dev>',
+        from: resendFromEmail.value() || 'PlayPath Melbourne <onboarding@resend.dev>',
         subject: `Your PlayPath pass: ${activity.name}`,
         text: [
           `Hello ${fullName},`,
@@ -338,6 +339,8 @@ export const sendCommunityPassEmail = onCall(
           {
             content: createCalendarAttachment(activity, fullName),
             filename: `playpath-${activity.id}-activity-pass.ics`,
+            type: 'text/calendar',
+            disposition: 'attachment',
           },
         ],
       })
